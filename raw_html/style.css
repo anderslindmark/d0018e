@@ -1,12 +1,13 @@
 /* http://www.456bereastreet.com/lab/developing_with_web_standards/csslayout/2-col/ */
 /* http://www.degraeve.com/color-palette/index.php?q=http://enchantingartwork.com/2009_landscapes/pleasant_countenance_copyright.jpg,0F22155CA04D6ABBACD4EBE187C36B,06371765DF4B82ECD9FFFFFFA8F584 */
+/* http://www.colorsontheweb.com/colorwizard.asp : base #cceedd */
 
 body {
 	font-family:Helvetica,Arial,Sans-serif;
 	margin:15px;
 	padding:0;
-	background:#c0c0c0;
 	background:#cceedd;
+	background: #EEEECC;
 }
 
 #wrap {
@@ -27,6 +28,7 @@ body {
 
 #nav {
 	background:#c0c0c0;
+	background: #DDDDDD;
 	height: 40px;
 	width: 1000px;
 	border-top: 1px dashed #888888;
@@ -60,6 +62,7 @@ body {
 	float:left;
 	width:240px; /* 294 + 1px border + 5px padding = 300 */
 	background:#cceedd;
+	background: #cceedd;
 	padding:4px;
 }
 
@@ -67,6 +70,7 @@ body {
 	float:right;
 	width:721px;
 	background:#dddddd;
+	background: #D6E3DD;
 	border-left: 1px dashed #888888;
 	padding:0px 15px;
 }
@@ -79,6 +83,7 @@ body {
 	clear:both;
 	background:#00eecc;
 	background:#c0c0c0;
+	background: #DDDDDD;
 	border-top: 1px dashed #888888;
 	padding:3px 10px;
 	font-weight:bold;
@@ -91,6 +96,7 @@ body {
 	height:150;
 	width:300px;
 	background:#ddeeff;
+	background:#EEEECC;
 	border:1px solid;
 	border-radius:5px;
 	display:none;
