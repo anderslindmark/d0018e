@@ -1,0 +1,19 @@
+1: Establish a minimalistic web-site
+====================================
+
+
+3. 	Setup the simplest possible web page for this assignment and verify that it works. This page 
+	will be the showroom of the rest of the assignment. Consider which tools you like to use 
+	(e.g., HTML, PHP, AJAX, JSON, XML/SOAP, etc). Keep it simple. Some useful sites for 
+	instructions are: http://www.w3schools.com/ , http://php.net/ ,
+		CSS-guide: http://www.456bereastreet.com/lab/developing_with_web_standards/csslayout/2-col/
+http://www.456bereastreet.com/lab/developing_with_web_standards/csslayout/2-col/
+
+
+
+6. 	Sidetrack (reading exercise). Read briefly what a CMS (Content Management System) is. 
+	Explore what a CMS would brings to you (e.g., Vosao, Wordpress, Joomla, Drupal). In this
+	course we will not use any CMS. 
+
+7. 	Write a short report on the selections you have made under 1-5, and report shortly on 6. 
+	Submit to your instructor and give a very short demo
