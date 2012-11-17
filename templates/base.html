@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>The Amazing Webshop</title>
+	<link rel="stylesheet" type="text/css" href="static/style.css" />
+	<script src="static/jquery.min.js"></script>
+	<script src="static/jquery.ui.position.min.js"></script> <!-- http://docs.jquery.com/UI/API/1.8/Position -->
+	<script>
+	 $(document).ready(function(){
+		 $("a#basket").mouseover( function(event) {
+			 $("#shoppingbasket").slideToggle();
+			 });
+			 $("#shoppingbasket").position({
+				 my: "right top",
+				 at: "right bottom",
+				 of: "a#basket",
+				 collision: "none",
+				 offset: "0 5"
+			 });
+		 });
+	</script>
+</head>
+
+<body>
+<div id=wrap>
+	<div id="header">The Amazing Webshop</div>
+	
+	<div id="nav">
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/account">My Account</a></li> <!-- Or 'Create Account' -->
+			<li><a id="basket" href="/basket">Shopping Basket</a></li> <!-- Or nothing -->
+			<li><a href="/logout">Log out</a></li> <!-- Or nothing -->
+		</ul>
+	</div> <!-- nav -->
+
+	<div id="shoppingbasket">
+		<strong>Items in your shopping basket:</strong>
+		<ul>
+			<li>Milk</li>
+			<li>Eggs</li>
+			<li>Cheese</li>
+		</ul>
+	</div> <!-- shoppingbasket -->
+
+	<div id="sidebar">
+		<h2>Categories and stuff</h2>
+		<p>Lorem ipsum dolor sit amet</p>
+		<ul>
+			<li>Blabla</li>
+			<li>Stuff</li>
+			<li>Other stuff</li>
+		</ul>
+		<p>Consectetuer adipiscing</p>
+		<ul>
+			<li>Blabla</li>
+			<li>Stuff</li>
+			<li>Other stuff</li>
+		</ul>
+	</div> <!-- sidebar -->
+
+	<div id="main">
+		{% block main %}{% endblock %}
+	</div> <!-- main -->
+
+	<div id="footer">
+		Footer stuff goes here...
+	</div> <! -- footer -->
+</div> <!-- wrap -->
+
+</body>
+
+</html>

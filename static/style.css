@@ -1,0 +1,104 @@
+/* http://www.456bereastreet.com/lab/developing_with_web_standards/csslayout/2-col/ */
+/* http://www.degraeve.com/color-palette/index.php?q=http://enchantingartwork.com/2009_landscapes/pleasant_countenance_copyright.jpg,0F22155CA04D6ABBACD4EBE187C36B,06371765DF4B82ECD9FFFFFFA8F584 */
+/* http://www.colorsontheweb.com/colorwizard.asp : base #cceedd */
+
+body {
+	font-family:Helvetica,Arial,Sans-serif;
+	margin:15px;
+	padding:0;
+	background:#cceedd;
+	background: #EEEECC;
+}
+
+#wrap {
+	width: 1000px;
+	margin:0 auto;
+	background:#dddddd;
+	background:#cceedd;
+	box-shadow: 2px 2px 20px #888888;
+	border: 1px solid;
+}
+
+#header {
+	font-size: 30pt;
+	padding: 10px;
+	font-weight: bold;
+	background:#eeeeee;
+}
+
+#nav {
+	background:#c0c0c0;
+	background: #DDDDDD;
+	height: 40px;
+	width: 1000px;
+	border-top: 1px dashed #888888;
+	border-bottom: 1px dashed #888888;
+	font-weight:bold;
+}
+
+#nav ul {
+	float:right;
+	margin:5px;
+	padding:5px;
+	list-style:none;
+}
+
+#nav li {
+	display:inline;
+	margin:0;
+	padding:0 5px;
+}
+
+#nav a {
+	text-decoration:none;
+	color: #112211;
+}
+
+#nav a:hover {
+	color: #667766;
+}
+
+#sidebar {
+	float:left;
+	width:240px; /* 294 + 1px border + 5px padding = 300 */
+	background:#cceedd;
+	background: #cceedd;
+	padding:4px;
+}
+
+#main {
+	float:right;
+	width:721px;
+	background:#dddddd;
+	background: #D6E3DD;
+	border-left: 1px dashed #888888;
+	padding:0px 15px;
+}
+
+#clear {
+	clear:both;
+}
+
+#footer {
+	clear:both;
+	background:#00eecc;
+	background:#c0c0c0;
+	background: #DDDDDD;
+	border-top: 1px dashed #888888;
+	padding:3px 10px;
+	font-weight:bold;
+	font-size:11pt;
+	text-align:right;
+}
+
+#shoppingbasket {
+	position:absolute;
+	height:150;
+	width:300px;
+	background:#ddeeff;
+	background:#EEEECC;
+	border:1px solid;
+	border-radius:5px;
+	display:none;
+	padding:5px;
+}
