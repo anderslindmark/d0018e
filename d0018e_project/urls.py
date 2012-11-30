@@ -11,6 +11,10 @@ urlpatterns = patterns('',
     # url(r'^d0018e_project/', include('d0018e_project.foo.urls')),
 
 	url(r'^$', 'shopping.views.index'),
+	url(r'^category/(?P<category>.+)$', 'shopping.views.showcategory'),
+	url(r'^product/(?P<productID>\d+)$', 'shopping.views.showproduct'),
+	url(r'^account$', 'shopping.views.account'),
+
 	url(r'^shh', 'shopping.views.loggedinonly'),
 	#url(r'/login', 'shopping.views.login'),
 	url(r'^login', 'django.contrib.auth.views.login'),

@@ -1,71 +1,87 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
+
 <head>
-	<title>The Amazing Webshop</title>
-	<link rel="stylesheet" type="text/css" href="static/style.css" />
-	<script src="static/jquery.min.js"></script>
-	<script src="static/jquery.ui.position.min.js"></script> <!-- http://docs.jquery.com/UI/API/1.8/Position -->
-	<script>
-	 $(document).ready(function(){
-		 $("a#basket").mouseover( function(event) {
-			 $("#shoppingbasket").slideToggle();
-			 });
-			 $("#shoppingbasket").position({
-				 my: "right top",
-				 at: "right bottom",
-				 of: "a#basket",
-				 collision: "none",
-				 offset: "0 5"
-			 });
-		 });
-	</script>
+<title>The Amazing Webshop</title>
+<link rel="stylesheet" type="text/css" href="/static/style.css" />
+<script src="/static/lib/jquery.min.js"></script>
+<script src="/static/lib/jquery.ui.position.min.js"></script> <!-- http://docs.jquery.com/UI/API/1.8/Position -->
+<script src="/static/lib/jquery.hoverIntent.minified.js"></script> <!-- http://cherne.net/brian/resources/jquery.hoverIntent.html -->
+<script>	
+	function showBasket() {
+		$("#shoppingbasket").slideToggle();
+		$("#shoppingbasket").position({
+			my: "right top",
+			at: "right bottom",
+			of: "a#basket",
+			collision: "none",
+			offset: "0 5"
+		});
+	}
+
+	function hideBasket() {
+		// Do nothing, mouseOver again instead to hide.
+		// This is because you want to be able to interact with the basket.
+		// TODO: Make the basket-popup a child?
+		// 		 Or make it a click-to-toggle type of thing with an arrow-icon next to the basket-link
+	}
+
+	var shopping_hover_conf = {
+		over: showBasket,
+		timeout: 500,
+		out: hideBasket
+	};
+
+	$(document).ready(function(){
+		$("#basket").hoverIntent(shopping_hover_conf);
+
+		$("#basket.arrowicon").click( function(event) {
+			alert("Hej");
+		});
+	});
+</script>
 </head>
 
 <body>
 <div id=wrap>
-	<div id="header">The Amazing Webshop</div>
+<div id="header">The Amazing Webshop</div>
 	
-	<div id="nav">
-		<ul>
-			<li><a href="/">Home</a></li>
-			<li><a href="/account">My Account</a></li> <!-- Or 'Create Account' -->
-			<li><a id="basket" href="/basket">Shopping Basket</a></li> <!-- Or nothing -->
-			<li><a href="/logout">Log out</a></li> <!-- Or nothing -->
-		</ul>
-	</div> <!-- nav -->
+<div id="nav">
+	<ul>
+		<!-- TODO: Make these linkable divs, like the sidebar, so that everything fits better and so that basket-hover is more natural -->
+		<li><a href="/">Home</a></li>
+		<li><a href="/account">My Account</a></li> <!-- Or 'Create Account' -->
+		<li><a id="basket" href="/basket">Shopping Basket</a><span class="arrowicon" style="display:inline-block;"></span></li> <!-- Or nothing -->
+		<li><a href="/logout">Log out</a></li> <!-- Or nothing -->
+	</ul>
+</div> <!-- nav -->
 
-	<div id="shoppingbasket">
-		<strong>Items in your shopping basket:</strong>
-		<ul>
-			<li>Milk</li>
-			<li>Eggs</li>
-			<li>Cheese</li>
-		</ul>
-	</div> <!-- shoppingbasket -->
+<div id="shoppingbasket">
+	<strong>Items in your shopping basket:</strong>
+	<ul>
+		<li>Milk</li>
+		<li>Eggs</li>
+		<li>Cheese</li>
+	</ul>
+</div> <!-- shoppingbasket -->
 
-	<div id="sidebar">
-		<h2>Categories and stuff</h2>
-		<p>Lorem ipsum dolor sit amet</p>
-		<ul>
-			<li>Blabla</li>
-			<li>Stuff</li>
-			<li>Other stuff</li>
-		</ul>
-		<p>Consectetuer adipiscing</p>
-		<ul>
-			<li>Blabla</li>
-			<li>Stuff</li>
-			<li>Other stuff</li>
-		</ul>
-	</div> <!-- sidebar -->
+{% block overridecontent %}
+<div id="sidebar">
+	<h2>Categories</h2>
+	{% for category in categories %}
+	<a {% if category.current %}class="current"{% endif %} href="/category/{{category.name}}">{{ category.name|capfirst }}</a>
+	{% endfor %}
+</div> <!-- sidebar -->
 
-	<div id="main">
-		{% block main %}{% endblock %}
-	</div> <!-- main -->
+<div id="main">
+	{% block main %}{% endblock %}
+</div> <!-- main -->
+{% endblock %}
 
-	<div id="footer">
-		Footer stuff goes here...
-	</div> <! -- footer -->
+<div id="footer">
+	Blipp blopp
+</div> <! -- footer -->
+
 </div> <!-- wrap -->
 
 </body>

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="catname">{{ category.name|capfirst }}</div>
+<div class="catdesc">{{ category.description }}</div>
+<div id="clear"></div>
+
+ {% for product in products %}
+ <p><strong>{{ product.name|capfirst }}</strong> - {{ product.description }} - <i>{{ product.stock }} in stock</i></p>
+ {% endfor %}
+
+
+{% endblock %}

@@ -22,6 +22,9 @@ class Category(models.Model):
 	name = models.CharField(max_length=50)
 	description = models.CharField(max_length=150)
 
+	def __repr__(self):
+		return "<Category: name=%r, description=%r>" % (self.name, self.description)
+
 class Asset(models.Model):
 	"""
 	Represents a product.
@@ -30,6 +33,9 @@ class Asset(models.Model):
 	description = models.CharField(max_length=150)
 	category = models.ForeignKey(Category) # Which category does this asset belong to
 	stock = models.IntegerField() # How many of this asset are in stock
+
+	def __repr__(self):
+		return "<Asset: name=%r, description=%r, category=%r, stock=%r>" % (self.name, self.description, self.category, self.stock)
 
 class Basket(models.Model):
 	"""
