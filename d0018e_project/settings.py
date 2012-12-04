@@ -157,4 +157,7 @@ LOGGING = {
 }
 
 # Where should login-redirects point:
-LOGIN_URL = "/login"
+LOGIN_URL = "/account/login"
+
+# Where login redirects with an empty {{ next }} should point:
+LOGIN_REDIRECT_URL = "/"

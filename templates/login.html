@@ -1,4 +1,19 @@
+{% extends 'base.html' %}
+
 {% load url from future %}
+
+{% block overridecontent %}
+<!-- Override #wrap background color to match #main -->
+<style type="text/css">
+#wrap {
+	background: #D6E3DD;
+}
+</style>
+
+<div id="overridecontent">
+<h1>Account</h1>
+
+<p><strong>Please enter your login information</strong></p>
 
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
@@ -20,3 +35,5 @@
 	<input type="submit" value="login" />
 	<input type="hidden" name="next" value="{{ next }}" />
 </form>
+</div>
+{% endblock %}

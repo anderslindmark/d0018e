@@ -11,15 +11,17 @@ urlpatterns = patterns('',
     # url(r'^d0018e_project/', include('d0018e_project.foo.urls')),
 
 	url(r'^$', 'shopping.views.index'),
+
 	url(r'^category/(?P<category>.+)$', 'shopping.views.showcategory'),
 	url(r'^product/(?P<productID>\d+)$', 'shopping.views.showproduct'),
-	url(r'^account$', 'shopping.views.account'),
 
-	url(r'^shh', 'shopping.views.loggedinonly'),
-	#url(r'/login', 'shopping.views.login'),
-	url(r'^login', 'django.contrib.auth.views.login'),
-	url(r'^logout', 'django.contrib.auth.views.logout', 
-		{'template_name': 'registration/logout.html'}),
+	url(r'^account/me$', 'shopping.views.account'),
+	url(r'^account/create$', 'shopping.views.create_account'),
+	url(r'^account/welcome$', 'shopping.views.welcome'),
+	url(r'^account/login', 'django.contrib.auth.views.login',
+		{'template_name': 'login.html'}),
+	url(r'^account/logout', 'django.contrib.auth.views.logout', 
+		{'template_name': 'logout.html'}),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
