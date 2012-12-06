@@ -7,8 +7,10 @@
 <script src="/static/lib/jquery.min.js"></script>
 <script src="/static/lib/jquery.ui.position.min.js"></script> <!-- http://docs.jquery.com/UI/API/1.8/Position -->
 <script src="/static/lib/jquery.hoverIntent.minified.js"></script> <!-- http://cherne.net/brian/resources/jquery.hoverIntent.html -->
+<script src="/static/lib/jquery-ui.min.js"></script>
 <script>	
 	function showBasket() {
+		$("#shoppingbasket").load('ajax/basket');
 		$("#shoppingbasket").slideToggle();
 		$("#shoppingbasket").position({
 			my: "right top",
@@ -38,6 +40,9 @@
 		$("#basket.arrowicon").click( function(event) {
 			alert("Hej");
 		});
+
+		{% block js_docready %}{% endblock %}
+
 	});
 </script>
 </head>
@@ -50,8 +55,8 @@
 	<ul>
 		<!-- TODO: Make these linkable divs, like the sidebar, so that everything fits better and so that basket-hover is more natural -->
 		<li><a href="/">Home</a></li>
-		<li><a id="basket" href="/basket">Shopping Basket</a><span class="arrowicon" style="display:inline-block;"></span></li> <!-- Or nothing -->
 		{% if logged_in %}
+			<li><a id="basket" href="/basket">Shopping Basket</a><span class="arrowicon" style="display:inline-block;"></span></li> <!-- Or nothing -->
 			<li><a href="/account/me">My Account</a></li>
 			<li><a href="/account/logout">Log out</a></li>
 		{% else %}

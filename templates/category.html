@@ -1,13 +1,35 @@
 {% extends 'base.html' %}
 
+{% block js_docready %}
+$(".buyproduct").click( function() {
+$.get("/ajax/addproduct/" + this.id, function(data) {
+		// Check for "OK"
+	});
+	// $(".prodbox#"+this.id).effect("transfer", {to: $("a#basket")}, 1000);
+	//$(".prodbox#" + this.id).hide();
+	//$(".prodbox#" + this.id).effect("transfer", {to: $("a#basket")}, 1000);
+	//$("a#basket").effect("pulsate", {times: 1}, 2000);
+	//$(".prodbox#" + this.id).effect("pulsate", {times: 1}, 1000);
+	$(".prodbox#" + this.id).effect("transfer", {to: $(".arrowicon")}, 750);
+
+});
+{% endblock %}
+ 
 {% block main %}
 <div class="catname">{{ category.name|capfirst }}</div>
 <div class="catdesc">{{ category.description }}</div>
 <div id="clear"></div>
 
- {% for product in products %}
- <p><strong>{{ product.name|capfirst }}</strong> - {{ product.description }} - <i>{{ product.stock }} in stock</i></p>
- {% endfor %}
+{% for product in products %}
+<div class="prodbox" id="{{product.pk}}">
+<p>
+	<strong>{{ product.name|capfirst }}</strong> 
+	- {{ product.description }} - <i>{{ product.stock }} in stock</i> 
+	<button class="buyproduct" id="{{product.pk}}">Buy</button>
+</p>
+</div>
+	<!--  http://stackoverflow.com/questions/8106230/django-refresh-page-if-change-data-by-other-user -->
+{% endfor %}
 
 
 {% endblock %}

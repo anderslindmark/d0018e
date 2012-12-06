@@ -36,3 +36,6 @@ class HomeTest(TestCase):
 # * Test removing items from basket
 # * Test placing an order
 #	* With no items
+
+# * Test adding a new user (assert success)
+# * Test adding a user with same username as an existing user (assert failure)

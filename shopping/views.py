@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response, render, redirect
-from shopping.models import Category, Asset, Customer
+from shopping.models import Category, Asset, Customer, Basket, BasketItem
 from shopping.local_forms import CreateUser
 from django.template import RequestContext
 from django.contrib.auth.models import User
@@ -60,9 +60,14 @@ def showproduct(request, productID):
 
 @login_required
 def account(request):
+	print type(request.user)
+	cust = Customer.objects.get(user=request.user)
+
 	return render_to_response("account.html",
 			{
 				'logged_in': request.user.is_authenticated(),
+				'user': request.user,
+				'cust': cust,
 			})
 
 def create_account(request):
@@ -125,3 +130,112 @@ def welcome(request):
 				'logged_in': request.user.is_authenticated(),
 				'name': request.user.first_name,
 				})
+
+def get_or_create_basket(request):
+	# Helper method
+	cust = Customer.objects.get(user=request.user)
+	try:
+		basket = Basket.objects.exclude(active=False).get(customer=cust)
+		print "Using existing basket"
+	except Basket.DoesNotExist:
+		print "Creating new basket"
+		basket = Basket(customer=cust)
+		basket.save()
+	return basket
+
+def build_asset_table(basket):
+	# Build count-table (dict of asset -> count)
+	asset_dict = dict()
+	# Get all assets
+	basket_items = BasketItem.objects.filter(basket=basket)
+	for basket_item in basket_items:
+		asset = basket_item.asset
+		if asset_dict.has_key(asset):
+			asset_dict[asset] += 1
+		else:
+			asset_dict[asset] = 1
+	return asset_dict
+
+@login_required
+def basket(request):
+	basket = get_or_create_basket(request)
+	assets = build_asset_table(basket)
+	total = sum( [item.price*count for item,count in assets.iteritems()] )
+
+	return render_to_response("basket.html", {
+		'logged_in': request.user.is_authenticated(),
+		'assets': assets.iteritems, # iteration of i,j will give asset,count pairs
+		'total': total,
+		})
+
+@login_required
+def ajax_basket(request):
+	basket = get_or_create_basket(request)
+	assets = build_asset_table(basket)
+
+	return render_to_response("ajax_basket.html", {
+		'assets': assets.iteritems,
+		})
+
+@login_required
+def ajax_addproduct(request, productID):
+	basket = get_or_create_basket(request)
+	try:
+		asset = Asset.objects.get(pk=productID)
+	except Asset.DoesNotExist:
+		print "Product not found!"
+		return HttpResponse("Error: No such product")
+	basket_item = BasketItem(basket=basket, asset=asset)
+	basket_item.save()
+	return HttpResponse("OK")
+
+@login_required
+def remove_product(request, itemID=-1):
+	basket = get_or_create_basket(request)
+	if itemID == -1:
+		# If itemID == -1 then all items will be removed.
+		BasketItem.objects.filter(basket=basket).delete()
+	else:
+		# TODO: This doesn't bulk-delete a number of assets. A set_item_count(asset) method is needed. Or just a count= parameter to this method.
+		try:
+			# BasketItem.objects.get(pk=itemID).delete()
+			items = BasketItem.objects.filter(basket=basket).filter(asset__pk = itemID)
+			for item in items:
+				item.delete()
+		except BasketItem.DoesNotExist:
+			pass
+
+	return redirect('/basket')
+
+@login_required
+def update_product_count(request, itemID, count):
+	# This isn't a very pretty way of doing things... but it'll have to do for now.
+	basket = get_or_create_basket(request)
+	count = int(count)
+	# First get all items of this type from the basket
+	try:
+		current_items = BasketItem.objects.filter(basket=basket).filter(asset__pk = itemID)
+	except BasketItem.DoesNotExist:
+		print "Error: No basket items found" # This only happens if rows are deleted after rendering /basket (i.e two open tabs or old session)
+		return redirect('/basket')
+	asset = current_items[0].asset
+	diff = abs(len(current_items) - count)
+	# Check if we need to add or delete items to reach 'count'
+	if len(current_items) < count:
+		# Add item(s)
+		for i in xrange(diff):
+			b = BasketItem(basket=basket, asset=asset)
+			b.save()
+	elif len(current_items) > count:
+		# Remove item(s)
+		iter = current_items.iterator()
+		for i in xrange(diff):
+			item = iter.next()
+			item.delete()
+	
+	return redirect('/basket')
+
+
+
+
+

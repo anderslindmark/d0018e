@@ -162,3 +162,7 @@ body {
 	padding:5px;
 	z-index: 2; /* Otherwise the shopping basket will be placed under the category-description div */
 }
+
+.ui-effects-transfer {
+	border:1px dashed;
+}
