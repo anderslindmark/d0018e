@@ -7,35 +7,36 @@ from shopping.local_forms import CreateUser
 from django.template import RequestContext
 from django.contrib.auth.models import User
 
-# TODO: Find out how to send the same context chunk to _all_ render*()-calls
-
 def _getCategories(request, current=None):
 	"""
-	Helper to setup the category list and make sure that the currently selected category persists through the session.
+	Helper to setup the category list and make sure that the currently selected category persists 
+	through the browsing session.
 	"""
 	# Get Categories
-	# Mark current cat somehow (maybe just add a field cat.isSelected = False except for if cat == current_category)
-	# https://docs.djangoproject.com/en/1.4/topics/templates/
-	current_category = request.session.get('current_category')
+	current_category = request.session.get('current_category') # ??
 	categories = Category.objects.all()
 	if current is not None:
 		for cat in categories:
 			if cat.name == current:
-				print "Setting current to:", str(cat.name)
-				cat.current = True
+				cat.current = True # ??
 	return categories
 
 def index(request):
-	#return HttpResponse("Hej")
+	"""
+	Shows the home page
+	"""
 	request_context = RequestContext(request, {
 				'categories': _getCategories(request),
 		})
 	return render(request, "home.html", request_context)
 
 def showcategory(request, category):
-	print "category:", str(category)
-	# Get all items related to that category
+	"""
+	Shows a page with all products related to a category
+	"""
+	# Get the category object
 	cat = Category.objects.get(name=category)
+	# Get all products belonging to taht category
 	products = Asset.objects.filter(category=cat)
 
 	request_context = RequestContext(request, {
@@ -47,6 +48,10 @@ def showcategory(request, category):
 	return render(request, "category.html", request_context)
 
 def showproduct(request, productID):
+	"""
+	Show a page with information about a specific product
+	"""
+	# TODO: Implement this
 	request_context = RequestContext(request, {
 				'categories': _getCategories(request),
 		})
@@ -55,7 +60,12 @@ def showproduct(request, productID):
 
 @login_required
 def account(request):
+	"""
+	Show a page with account information and order history.
+	"""
 	cust = Customer.objects.get(user=request.user)
+
+	# TODO: Fetch order history
 
 	request_context = RequestContext(request, {
 				'cust': cust,
@@ -64,11 +74,16 @@ def account(request):
 	return render(request, "account.html", request_context)
 
 def create_account(request):
+	"""
+	Create an account
+	"""
+	# TODO: Move the 'create customer'-part (atleast) to a helper and then run that
+	#		method (with a check) at login, so that all users are guaranteed to have
+	#		a customer-object. (This is needed for the super-user created at ./manage.py syncdb)
 	if request.method == 'POST':
 		# Form is submitted
 		form = CreateUser(request.POST)
 		if form.is_valid():
-			print "Form is valid"
 			# Get form-data
 			username = form.cleaned_data['username']
 			first_name = form.cleaned_data['first_name']
@@ -86,7 +101,7 @@ def create_account(request):
 				# FAIL: The username is already taken
 				# TODO: Return the error and show the form-page again
 			
-			# We could do more checks here, for instance unique e-mail. But we won't...
+			# We could do more checks here, for instance "is e-mail unique". But we won't...
 			# Create the User object:
 			user = User.objects.create_user(username, email, password)
 			user.first_name = first_name
@@ -97,16 +112,21 @@ def create_account(request):
 			cust = Customer(address=address, phone_number=phone_number, user=user)
 			cust.save()
 
-			# The user-account is now created. Log in and redirect to welcome.html
+			# The user-account is now created. 
+			# Log in and redirect to welcome.html:
+			# Authenticate (this needs to be done before login())
 			u_auth = authenticate(username=username, password=password)
-			# Make sure that authentication was successful.
-			# Iwe can't authenticate the newly created user, something is very wrong..
+			# Make sure that authentication was successful, if we can't authenticate the newly created 
+			# user, something is very wrong..
 			assert type(u_auth) is not None 
+
+			# Log on the user:
 			login(request, u_auth)
 
 			# Send user to the welcome page:
 			return redirect('/account/welcome')	
 	else:
+		# Start a new, blank, form
 		form = CreateUser()
 
 	# Either form will be a newly created one, or an old one with information attached
@@ -118,39 +138,55 @@ def create_account(request):
 
 @login_required
 def welcome(request):
+	"""
+	Shows a welcome messge to a newly created user
+	"""
 	request_context = RequestContext(request)
-
 	return render(request, "welcome.html", request_context)
 
-def get_or_create_basket(request):
-	# Helper method
+def _get_or_create_basket(request):
+	"""
+	Helper method used to either fetch the users current shopping-basket,
+	or create a new basket if no current basket exists.
+	This way, the user always has a basket that is saved between sessions.
+	"""
+	# Fetch customer object
 	cust = Customer.objects.get(user=request.user)
 	try:
+		# Get the current basket
 		basket = Basket.objects.exclude(active=False).get(customer=cust)
-		print "Using existing basket"
 	except Basket.DoesNotExist:
-		print "Creating new basket"
+		# Create new basket
 		basket = Basket(customer=cust)
 		basket.save()
 	return basket
 
-def build_asset_table(basket):
+def _build_asset_table(basket):
+	"""
+	Helper method used to build a dictionary with asset names as keys and asset-counts as values.
+	If, for instance, the basket has three BasketItems with the asset 'shoe', that dictionary entry
+	will be asset_table['shoe'] = 3.
+	"""
 	# Build count-table (dict of asset -> count)
-	asset_dict = dict()
+	asset_table = dict()
 	# Get all assets
 	basket_items = BasketItem.objects.filter(basket=basket)
 	for basket_item in basket_items:
 		asset = basket_item.asset
-		if asset_dict.has_key(asset):
-			asset_dict[asset] += 1
+		if asset_table.has_key(asset):
+			asset_table[asset] += 1
 		else:
-			asset_dict[asset] = 1
-	return asset_dict
+			asset_table[asset] = 1
+	return asset_table
 
 @login_required
 def basket(request):
-	basket = get_or_create_basket(request)
-	assets = build_asset_table(basket)
+	"""
+	Show a page with shopping basket information
+	"""
+	basket = _get_or_create_basket(request)
+	assets = _build_asset_table(basket)
+	# Sum up prices and counts for all the assets in the basket
 	total = sum( [item.price*count for item,count in assets.iteritems()] )
 
 	request_context = RequestContext(request, {
@@ -162,8 +198,11 @@ def basket(request):
 
 @login_required
 def ajax_basket(request):
-	basket = get_or_create_basket(request)
-	assets = build_asset_table(basket)
+	"""
+	Show a mini-page with shopping basket, used for AJAX-tooltips.
+	"""
+	basket = _get_or_create_basket(request)
+	assets = _build_asset_table(basket)
 
 	request_context = RequestContext(request, {
 			'assets': assets.iteritems,
@@ -172,50 +211,64 @@ def ajax_basket(request):
 
 @login_required
 def ajax_addproduct(request, productID):
-	basket = get_or_create_basket(request)
+	"""
+	Called using an AJAX call when adding a product to the shopping basket
+	"""
+	basket = _get_or_create_basket(request)
 	try:
+		# Get the asset
 		asset = Asset.objects.get(pk=productID)
 	except Asset.DoesNotExist:
 		print "Product not found!"
 		return HttpResponse("Error: No such product")
+	# Create a new BasketItem associated with the user and the product
 	basket_item = BasketItem(basket=basket, asset=asset)
 	basket_item.save()
 	return HttpResponse("OK")
 
 @login_required
 def remove_product(request, itemID=-1):
-	basket = get_or_create_basket(request)
+	"""
+	Remove all occurences of a product (or all products, if itemID = -1) from the shopping basket. 
+	Redirects back to /basket since that is the only place it will be called from.
+	"""
+	basket = _get_or_create_basket(request)
 	if itemID == -1:
 		# If itemID == -1 then all items will be removed.
 		BasketItem.objects.filter(basket=basket).delete()
 	else:
-		# TODO: This doesn't bulk-delete a number of assets. A set_item_count(asset) method is needed. Or just a count= parameter to this method.
 		try:
 			# BasketItem.objects.get(pk=itemID).delete()
 			items = BasketItem.objects.filter(basket=basket).filter(asset__pk = itemID)
 			for item in items:
 				item.delete()
 		except BasketItem.DoesNotExist:
+			# Since no BasketItem with this asset exists, our job is already done.
 			pass
 
 	return redirect('/basket')
 
 @login_required
 def update_product_count(request, itemID, count):
-	# This isn't a very pretty way of doing things... but it'll have to do for now.
-	basket = get_or_create_basket(request)
+	"""
+	Change the number of instances of a specific product that exists in our database.
+	"""
+	# TODO: Obviously BasketItem needs a 'count' parameter, this needs to be changed (ffs)
+	basket = _get_or_create_basket(request)
 	count = int(count)
 	# First get all items of this type from the basket
 	try:
 		current_items = BasketItem.objects.filter(basket=basket).filter(asset__pk = itemID)
 	except BasketItem.DoesNotExist:
-		print "Error: No basket items found" # This only happens if rows are deleted after rendering /basket (i.e two open tabs or old session)
+		print "Error: No basket items found" 
+		# This only happens if rows are deleted after rendering /basket (i.e two open tabs or old session)
 		return redirect('/basket')
 	asset = current_items[0].asset
 	diff = abs(len(current_items) - count)
 	# Check if we need to add or delete items to reach 'count'
 	if len(current_items) < count:
 		# Add item(s)
+		# TODO: item.count = count
 		for i in xrange(diff):
 			b = BasketItem(basket=basket, asset=asset)
 			b.save()
