@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render_to_response, render, redirect
+from django.shortcuts import render, redirect
 from shopping.models import Category, Asset, Customer, Basket, BasketItem
 from shopping.local_forms import CreateUser
 from django.template import RequestContext
@@ -27,48 +27,41 @@ def _getCategories(request, current=None):
 
 def index(request):
 	#return HttpResponse("Hej")
-	if request.user.is_authenticated():
-		print "User is authed"
-	else:
-		print "User is NOT authed"
-	return render_to_response("home.html", 
-			{
+	request_context = RequestContext(request, {
 				'categories': _getCategories(request),
-				'logged_in': request.user.is_authenticated(),
-			})
+		})
+	return render(request, "home.html", request_context)
 
 def showcategory(request, category):
 	print "category:", str(category)
 	# Get all items related to that category
 	cat = Category.objects.get(name=category)
 	products = Asset.objects.filter(category=cat)
-	return render_to_response("category.html", 
-			{
+
+	request_context = RequestContext(request, {
 				'categories': _getCategories(request, current=category),
 				'category': cat,
 				'products': products,
-				'logged_in': request.user.is_authenticated(),
-			})
+		})
+
+	return render(request, "category.html", request_context)
 
 def showproduct(request, productID):
-	print "product id:", str(productID)
-	return render_to_response("product.html", 
-			{
+	request_context = RequestContext(request, {
 				'categories': _getCategories(request),
-				'logged_in': request.user.is_authenticated(),
-			})
+		})
+
+	return render(request, "product.html", request_context)
 
 @login_required
 def account(request):
-	print type(request.user)
 	cust = Customer.objects.get(user=request.user)
 
-	return render_to_response("account.html",
-			{
-				'logged_in': request.user.is_authenticated(),
-				'user': request.user,
+	request_context = RequestContext(request, {
 				'cust': cust,
-			})
+		})
+
+	return render(request, "account.html", request_context)
 
 def create_account(request):
 	if request.method == 'POST':
@@ -117,19 +110,17 @@ def create_account(request):
 		form = CreateUser()
 
 	# Either form will be a newly created one, or an old one with information attached
-	reqcon = RequestContext(request, {
-				'logged_in': request.user.is_authenticated(),
+	request_context = RequestContext(request, {
 				'form': form,
 				})
 
-	return render(request, "create_account.html", reqcon)
+	return render(request, "create_account.html", request_context)
 
 @login_required
 def welcome(request):
-	return render_to_response("welcome.html", {
-				'logged_in': request.user.is_authenticated(),
-				'name': request.user.first_name,
-				})
+	request_context = RequestContext(request)
+
+	return render(request, "welcome.html", request_context)
 
 def get_or_create_basket(request):
 	# Helper method
@@ -162,20 +153,22 @@ def basket(request):
 	assets = build_asset_table(basket)
 	total = sum( [item.price*count for item,count in assets.iteritems()] )
 
-	return render_to_response("basket.html", {
-		'logged_in': request.user.is_authenticated(),
+	request_context = RequestContext(request, {
 		'assets': assets.iteritems, # iteration of i,j will give asset,count pairs
 		'total': total,
 		})
+
+	return render(request, "basket.html", request_context)
 
 @login_required
 def ajax_basket(request):
 	basket = get_or_create_basket(request)
 	assets = build_asset_table(basket)
 
-	return render_to_response("ajax_basket.html", {
-		'assets': assets.iteritems,
-		})
+	request_context = RequestContext(request, {
+			'assets': assets.iteritems,
+			})
+	return render(request, "ajax_basket.html", request_context)
 
 @login_required
 def ajax_addproduct(request, productID):

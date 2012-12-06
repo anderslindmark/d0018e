@@ -55,7 +55,7 @@
 	<ul>
 		<!-- TODO: Make these linkable divs, like the sidebar, so that everything fits better and so that basket-hover is more natural -->
 		<li><a href="/">Home</a></li>
-		{% if logged_in %}
+		{% if user.is_authenticated %}
 			<li><a id="basket" href="/basket">Shopping Basket</a><span class="arrowicon" style="display:inline-block;"></span></li> <!-- Or nothing -->
 			<li><a href="/account/me">My Account</a></li>
 			<li><a href="/account/logout">Log out</a></li>
@@ -89,7 +89,7 @@
 {% endblock %}
 
 <div id="footer">
-	{% if logged_in %}
+	{% if user.is_authenticated %}
 	Blipp blopp
 	{% else %}
 	Blopp blipp
