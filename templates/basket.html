@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block js_docready %}
+
+$(".upditem").click( function() {
+	inp = $("input#" + this.id);
+	count = inp.val()
+	url = "/basket/update/" + this.id + "/" + count;
+	window.location = url;
+});
+
+$(".remitem").click( function() {
+	url = "/basket/remove/" + this.id;
+	window.location = url;
+});
+
+{% endblock %}
+
+{% block overridecontent %}
+<!-- Override #wrap background color to match #main -->
+<style type="text/css">
+#wrap {
+	background: #D6E3DD;
+}
+
+table {
+	border-collapse: collapse;
+	width: 50%;
+}
+table, th, td {
+	border: 1px solid green;
+	padding-left: 3px;
+}
+
+tr {
+	background-color: #eeeecc;
+}
+
+tr.odd {
+	background-color: #eeeeee;
+}
+
+tr.even {
+	background-color: #dddddd;
+}
+
+</style>
+
+<div id="overridecontent">
+<h1>Shopping basket</h1>
+
+<table>
+	<tr>
+		<td><i>Item</i></td>
+		<td><i>Cost</i></td>
+		<td><i>Count</i></td>
+		<td><i>Remove</i></td>
+	</tr>
+	{% for item, count in assets %}
+	<tr class="{% cycle 'odd' 'even' %}">
+		<td>{{ item|capfirst }}</td>
+		<td>{{item.price}} kr</td>
+		<td><input type="number" id="{{item.pk}}" value="{{ count }}" min="0" max="99" /> <button class="upditem" id="{{item.pk}}">Update</button></td>
+		<td><button class="remitem" id="{{item.pk}}">Remove</button></td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td><i>Total</i></td>
+		<td colspan="3">{{total}} kr</td>
+	</tr>
+</table>
+<p>
+<a href="/order">Place order</a>
+<a href="/basket/remove/all">Clear basket</a> <!-- http://stackoverflow.com/questions/8106230/django-refresh-page-if-change-data-by-other-user -->
+</p>
+</div>
+{% endblock %}

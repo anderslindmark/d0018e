@@ -1,0 +1,7 @@
+<ul>
+	{% for item, count in assets %}
+	<li>{{ item|capfirst }} - {{ count }}</li>
+	{% endfor %}
+</ul>
+<a href="/order">Place order</a>
+<a href="#">Clear basket</a> <!-- http://stackoverflow.com/questions/8106230/django-refresh-page-if-change-data-by-other-user -->
