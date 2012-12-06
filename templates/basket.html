@@ -56,12 +56,15 @@ tr.even {
 		<td><i>Count</i></td>
 		<td><i>Remove</i></td>
 	</tr>
-	{% for item, count in assets %}
+	{% for item in items %}
 	<tr class="{% cycle 'odd' 'even' %}">
-		<td>{{ item|capfirst }}</td>
-		<td>{{item.price}} kr</td>
-		<td><input type="number" id="{{item.pk}}" value="{{ count }}" min="0" max="99" /> <button class="upditem" id="{{item.pk}}">Update</button></td>
-		<td><button class="remitem" id="{{item.pk}}">Remove</button></td>
+		<td>{{ item.asset|capfirst }}</td>
+		<td>{{item.asset.price}} kr</td>
+		<td>
+			<input type="number" id="{{item.asset.pk}}" value="{{ item.count }}" min="0" max="99" /> 
+			<button class="upditem" id="{{item.asset.pk}}">Update</button>
+		</td>
+		<td><button class="remitem" id="{{item.asset.pk}}">Remove</button></td>
 	</tr>
 	{% endfor %}
 	<tr>

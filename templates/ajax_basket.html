@@ -1,7 +1,9 @@
-<ul>
-	{% for item, count in assets %}
-	<li>{{ item|capfirst }} - {{ count }}</li>
+<table>
+	{% for item in items %}
+	<tr>
+		<td>{{ item.asset|capfirst }}</td>
+		<td><i>{{ item.count }}</i></td>
+	</tr>
 	{% endfor %}
-</ul>
-<a href="/order">Place order</a>
-<a href="#">Clear basket</a> <!-- http://stackoverflow.com/questions/8106230/django-refresh-page-if-change-data-by-other-user -->
+</table>
+<a href="/basket/remove/all">Clear basket</a>

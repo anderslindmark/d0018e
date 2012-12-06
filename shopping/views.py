@@ -161,36 +161,21 @@ def _get_or_create_basket(request):
 		basket.save()
 	return basket
 
-def _build_asset_table(basket):
-	"""
-	Helper method used to build a dictionary with asset names as keys and asset-counts as values.
-	If, for instance, the basket has three BasketItems with the asset 'shoe', that dictionary entry
-	will be asset_table['shoe'] = 3.
-	"""
-	# Build count-table (dict of asset -> count)
-	asset_table = dict()
-	# Get all assets
-	basket_items = BasketItem.objects.filter(basket=basket)
-	for basket_item in basket_items:
-		asset = basket_item.asset
-		if asset_table.has_key(asset):
-			asset_table[asset] += 1
-		else:
-			asset_table[asset] = 1
-	return asset_table
-
 @login_required
 def basket(request):
 	"""
 	Show a page with shopping basket information
 	"""
 	basket = _get_or_create_basket(request)
-	assets = _build_asset_table(basket)
+	items = BasketItem.objects.filter(basket=basket)
 	# Sum up prices and counts for all the assets in the basket
-	total = sum( [item.price*count for item,count in assets.iteritems()] )
+	#total = sum( [item.price*count for item,count in assets.iteritems()] )
+	total = 0
+	for item in items:
+		total += item.asset.price * item.count
 
 	request_context = RequestContext(request, {
-		'assets': assets.iteritems, # iteration of i,j will give asset,count pairs
+		'items': items,
 		'total': total,
 		})
 
@@ -202,10 +187,10 @@ def ajax_basket(request):
 	Show a mini-page with shopping basket, used for AJAX-tooltips.
 	"""
 	basket = _get_or_create_basket(request)
-	assets = _build_asset_table(basket)
+	items = BasketItem.objects.filter(basket=basket)
 
 	request_context = RequestContext(request, {
-			'assets': assets.iteritems,
+			'items': items,
 			})
 	return render(request, "ajax_basket.html", request_context)
 
@@ -221,8 +206,12 @@ def ajax_addproduct(request, productID):
 	except Asset.DoesNotExist:
 		print "Product not found!"
 		return HttpResponse("Error: No such product")
-	# Create a new BasketItem associated with the user and the product
-	basket_item = BasketItem(basket=basket, asset=asset)
+	# Get or create a new BasketItem associated with the user and the product
+	try:
+		basket_item = BasketItem.objects.filter(basket=basket).get(asset__pk = productID)
+	except:
+		basket_item = BasketItem(basket=basket, asset=asset)
+	basket_item.count += 1
 	basket_item.save()
 	return HttpResponse("OK")
 
@@ -239,9 +228,8 @@ def remove_product(request, itemID=-1):
 	else:
 		try:
 			# BasketItem.objects.get(pk=itemID).delete()
-			items = BasketItem.objects.filter(basket=basket).filter(asset__pk = itemID)
-			for item in items:
-				item.delete()
+			item = BasketItem.objects.filter(basket=basket).get(asset__pk = itemID)
+			item.delete()
 		except BasketItem.DoesNotExist:
 			# Since no BasketItem with this asset exists, our job is already done.
 			pass
@@ -256,32 +244,12 @@ def update_product_count(request, itemID, count):
 	# TODO: Obviously BasketItem needs a 'count' parameter, this needs to be changed (ffs)
 	basket = _get_or_create_basket(request)
 	count = int(count)
-	# First get all items of this type from the basket
-	try:
-		current_items = BasketItem.objects.filter(basket=basket).filter(asset__pk = itemID)
-	except BasketItem.DoesNotExist:
-		print "Error: No basket items found" 
-		# This only happens if rows are deleted after rendering /basket (i.e two open tabs or old session)
-		return redirect('/basket')
-	asset = current_items[0].asset
-	diff = abs(len(current_items) - count)
-	# Check if we need to add or delete items to reach 'count'
-	if len(current_items) < count:
-		# Add item(s)
-		# TODO: item.count = count
-		for i in xrange(diff):
-			b = BasketItem(basket=basket, asset=asset)
-			b.save()
-	elif len(current_items) > count:
-		# Remove item(s)
-		iter = current_items.iterator()
-		for i in xrange(diff):
-			item = iter.next()
-			item.delete()
+	item = BasketItem.objects.filter(basket=basket).get(asset__pk = itemID)
+	if count <= 0:
+		item.delete()
+	else:
+		item.count = count
+		item.save()
 	
 	return redirect('/basket')
-
-
-
-
 

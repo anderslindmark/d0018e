@@ -52,8 +52,10 @@ class Basket(models.Model):
 	Shopping basket, contains a list of assets and which customer it belongs to.
 	"""
 	customer = models.ForeignKey(Customer)
-	active = models.BooleanField(default=True)
-
+	active = models.BooleanField(default=True) # Active = current basket, inactive = order
+	# These two fields are only interesting when the basket becomes an order:
+	date_placed = models.DateTimeField(null=True) # Date the order was placed
+	date_filled = models.DateTimeField(null=True) # Date the order was filled 
 	def __unicode__(self):
 		return str(self.customer) + "s shopping basket"
 
@@ -63,15 +65,5 @@ class BasketItem(models.Model):
 	"""
 	basket = models.ForeignKey(Basket)
 	asset = models.ForeignKey(Asset)
-
-class Order(models.Model):
-	"""
-	A placed order, contains information about which assets was ordered, which customer placed the order and
-	when the order was placed/shipped.
-	"""
-	basket = models.ForeignKey(Basket)
-	# TODO: move these two fields into basket. if basket.active = False then it is an order and these two fields are used
-	date_placed = models.DateTimeField(auto_now=True) # Date the order was placed
-	date_filled = models.DateTimeField() # Date the order was filled 
-
+	count = models.IntegerField(default=0)
 

@@ -1,6 +1,6 @@
 #DJANGO_SETTINGS_MODULE=d0018e_project.settings python populatedb.py
 
-from shopping.models import Customer, Category, Asset, Basket, Order
+from shopping.models import Customer, Category, Asset, Basket
 
 categories = [
 		('socks', 'Items to put on your feet'),
