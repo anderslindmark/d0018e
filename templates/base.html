@@ -84,7 +84,7 @@
 {% endblock %}
 
 <div id="footer">
-	{% if user.is_authenticated %} Blipp blopp {% else %} Blopp blipp {% endif %}
+	{% if user.is_authenticated %} Blipp blopp ({{user.username}}){% else %} Blopp blipp {% endif %}
 </div> <! -- footer -->
 </div> <!-- wrap -->
 

@@ -14,34 +14,32 @@ urlpatterns = patterns('',
 	url(r'^category/(?P<category>.+)$', 'shopping.views.showcategory'),
 	url(r'^product/(?P<productID>\d+)$', 'shopping.views.showproduct'),
 
-	url(r'^account/me$', 'shopping.views.account'),
-	url(r'^account/create$', 'shopping.views.create_account'),
-	url(r'^account/missing_info', 'shopping.views.create_customer_special'),
+	# Account-related pages
+	url(r'^account/me$', 'shopping.views_account.show_account'),
+	url(r'^account/create$', 'shopping.views_account.create_account'),
+	url(r'^account/missing_info', 'shopping.views_account.create_missing_customer'),
+	url(r'^account/welcome$', 'shopping.views.welcome'),
+	url(r'^account/thankyou$', 'shopping.views.thankyou'),
 	url(r'^account/login', 'django.contrib.auth.views.login',
 		{'template_name': 'login.html'}),
 	url(r'^account/logout', 'django.contrib.auth.views.logout', 
 		{'template_name': 'logout.html'}),
 
-	url(r'^account/welcome$', 'shopping.views.welcome'),
-	url(r'^account/thankyou$', 'shopping.views.thankyou'),
+	# Basket and order related pages
+	url(r'^basket$', 'shopping.views_basket.basket'),
+	url(r'^basket/remove/(?P<itemID>\d+)$', 'shopping.views_basket.remove_product'),
+	url(r'^basket/remove/all$', 'shopping.views_basket.remove_product'),
+	url(r'^basket/update/(?P<itemID>\d+)/(?P<count>\d+)$', 'shopping.views_basket.update_product_count'),
+	url(r'^order$', 'shopping.views_basket.place_order'),
+	url(r'^order/placed$', 'shopping.views_basket.order_placed'),
 
-	url(r'^basket$', 'shopping.views.basket'),
-	url(r'^basket/remove/(?P<itemID>\d+)$', 'shopping.views.remove_product'),
-	url(r'^basket/remove/all$', 'shopping.views.remove_product'),
-	url(r'^basket/update/(?P<itemID>\d+)/(?P<count>\d+)$', 'shopping.views.update_product_count'),
-	url(r'^order$', 'shopping.views.place_order'),
-	url(r'^order/placed$', 'shopping.views.order_placed'),
-
-	url(r'^ajax/basket$', 'shopping.views.ajax_basket'),
-	url(r'^ajax/addproduct/(?P<productID>\d+)$', 'shopping.views.ajax_addproduct'),
-
-
-
+	# AJAX-pages
+	url(r'^ajax/basket$', 'shopping.views_basket.ajax_basket'),
+	url(r'^ajax/addproduct/(?P<productID>\d+)$', 'shopping.views_basket.ajax_addproduct'),
 
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 )
