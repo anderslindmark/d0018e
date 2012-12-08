@@ -200,7 +200,7 @@ table#minibasket td, tr {
 
 #errorbox {
 	border: 2px dashed red;
-	border-radius: 10px;
+	border-radius: 5px;
 	padding: 0px 10px;
 	display: inline-block;
 	background-color: hsla(120,65%,75%,0.3);

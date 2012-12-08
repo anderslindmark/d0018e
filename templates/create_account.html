@@ -13,6 +13,14 @@
 <div id="overridecontent">
 <h1>Create Account</h1>
 
+{% if problems %}
+<div id="errorbox">
+	{% for problem in problems %}
+	{{ problem }}
+	{% endfor %}
+</div>
+{% endif %}
+
 <p><strong>Please enter your information</strong></p>
 
 <form action="/account/create" method="post">{% csrf_token %}

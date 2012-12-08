@@ -40,6 +40,7 @@ def create_account(request):
 	"""
 	Create an account
 	"""
+	problems = []
 	if request.method == 'POST':
 		# Form is submitted
 		form = CreateUser(request.POST)
@@ -57,34 +58,33 @@ def create_account(request):
 			# Check if username is available:
 			users = User.objects.filter(username=username)
 			if not len(users) == 0:
-				pass
-				# FAIL: The username is already taken
-				# TODO: Return the error and show the form-page again
-			
-			# We could do more checks here, for instance "is e-mail unique". But we won't...
-			# Create the User object:
-			user = User.objects.create_user(username, email, password)
-			user.first_name = first_name
-			user.last_name = last_name
-			user.save()
-			
-			# Create the Customer object:
-			cust = Customer(address=address, phone_number=phone_number, user=user)
-			cust.save()
+				# The username already exists
+				problems.append("Username already taken")
+			else:	
+				# We could do more checks here, for instance "is e-mail unique". But we won't...
+				# Create the User object:
+				user = User.objects.create_user(username, email, password)
+				user.first_name = first_name
+				user.last_name = last_name
+				user.save()
+				
+				# Create the Customer object:
+				cust = Customer(address=address, phone_number=phone_number, user=user)
+				cust.save()
 
-			# The user-account is now created. 
-			# Log in and redirect to welcome.html:
-			# Authenticate (this needs to be done before login())
-			u_auth = authenticate(username=username, password=password)
-			# Make sure that authentication was successful, if we can't authenticate the newly created 
-			# user, something is very wrong..
-			assert type(u_auth) is not None 
+				# The user-account is now created. 
+				# Log in and redirect to welcome.html:
+				# Authenticate (this needs to be done before login())
+				u_auth = authenticate(username=username, password=password)
+				# Make sure that authentication was successful, if we can't authenticate the newly created 
+				# user, something is very wrong..
+				assert type(u_auth) is not None 
 
-			# Log on the user:
-			login(request, u_auth)
+				# Log on the user:
+				login(request, u_auth)
 
-			# Send user to the welcome page:
-			return redirect('/account/welcome')	
+				# Send user to the welcome page:
+				return redirect('/account/welcome')	
 	else:
 		# Start a new, blank, form
 		form = CreateUser()
@@ -92,6 +92,7 @@ def create_account(request):
 	# Either form will be a newly created one, or an old one with information attached
 	request_context = RequestContext(request, {
 				'form': form,
+				'problems': problems,
 				})
 
 	return render(request, "create_account.html", request_context)
