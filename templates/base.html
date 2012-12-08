@@ -10,7 +10,7 @@
 <script src="/static/lib/jquery-ui.min.js"></script>
 <script>	
 	function showBasket() {
-		$("#shoppingbasket").load('ajax/basket');
+		$("#shoppingbasket").load('/ajax/basket');
 		$("#shoppingbasket").slideToggle();
 		$("#shoppingbasket").position({
 			my: "right top",
@@ -67,12 +67,7 @@
 </div> <!-- nav -->
 
 <div id="shoppingbasket">
-	<strong>Items in your shopping basket:</strong>
-	<ul>
-		<li>Milk</li>
-		<li>Eggs</li>
-		<li>Cheese</li>
-	</ul>
+	<i>Loading basket ...</i>
 </div> <!-- shoppingbasket -->
 
 {% block overridecontent %}
@@ -89,15 +84,9 @@
 {% endblock %}
 
 <div id="footer">
-	{% if user.is_authenticated %}
-	Blipp blopp
-	{% else %}
-	Blopp blipp
-	{% endif %}
+	{% if user.is_authenticated %} Blipp blopp {% else %} Blopp blipp {% endif %}
 </div> <! -- footer -->
-
 </div> <!-- wrap -->
 
 </body>
-
 </html>

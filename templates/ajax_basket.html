@@ -1,9 +1,13 @@
-<table>
+{% if items %}
+<table id="minibasket">
 	{% for item in items %}
 	<tr>
-		<td>{{ item.asset|capfirst }}</td>
+		<td><strong>{{ item.asset|capfirst }}</strong></td>
 		<td><i>{{ item.count }}</i></td>
 	</tr>
 	{% endfor %}
 </table>
 <a href="/basket/remove/all">Clear basket</a>
+{% else %}
+Your basket is empty
+{% endif %}

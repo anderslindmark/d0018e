@@ -3,15 +3,22 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from shopping.models import Category, Asset, Customer, Basket, BasketItem
-from shopping.local_forms import CreateUser
+from shopping.local_forms import CreateUser, CreateCustomer, PlaceOrder
 from django.template import RequestContext
 from django.contrib.auth.models import User
+
+from datetime import datetime
+
+# TODO: Write a @basket_required-decorator, 
+#   alternatively a @customer_and_basket_required which redirects to /account_missing_info and later creates baskets (overkill?)
+# TODO: Move code out to views_basket.py, views_account.py, etc
 
 def _getCategories(request, current=None):
 	"""
 	Helper to setup the category list and make sure that the currently selected category persists 
 	through the browsing session.
 	"""
+	# TODO: This does not use current yet
 	# Get Categories
 	current_category = request.session.get('current_category') # ??
 	categories = Category.objects.all()
@@ -52,8 +59,11 @@ def showproduct(request, productID):
 	Show a page with information about a specific product
 	"""
 	# TODO: Implement this
+	asset = Asset.objects.get(pk=productID)
+
 	request_context = RequestContext(request, {
 				'categories': _getCategories(request),
+				'asset': asset,
 		})
 
 	return render(request, "product.html", request_context)
@@ -63,16 +73,47 @@ def account(request):
 	"""
 	Show a page with account information and order history.
 	"""
-	cust = Customer.objects.get(user=request.user)
+	try:
+		cust = Customer.objects.get(user=request.user)
+	except Customer.DoesNotExist:
+		return redirect('/account/missing_info')
 
-	# TODO: Fetch order history
+	baskets = Basket.objects.filter(customer=cust).filter(active=False)
+	orders = []
+	for order in baskets:
+		items = BasketItem.objects.filter(basket=order)
+		orderinfo = dict()
+		orderinfo['items'] = items
+		orderinfo['basket'] = order
+		orderinfo['total'] = _get_basket_total(items) # This is not a good solution, since cost could have changed since order was placed
+		orders.append(orderinfo)
 
 	request_context = RequestContext(request, {
 				'cust': cust,
+				'orders': orders,
 		})
 
 	return render(request, "account.html", request_context)
 
+def create_customer_special(request):
+	"""
+	This is called if the current user does not have a Customer-object associated to it
+	"""
+	if request.method == 'POST':
+		form = CreateCustomer(request.POST)
+		if form.is_valid():
+			address = form.cleaned_data['address']
+			phone_number = form.cleaned_data['phone_number']
+			user = request.user
+			cust = Customer(address=address, phone_number=phone_number, user=user)
+			cust.save()
+			return redirect('/account/thankyou')
+	else:
+		form = CreateCustomer()
+	request_context = RequestContext(request, {'form': form})
+	return render(request, "create_customer.html", request_context)
+
+@login_required
 def create_account(request):
 	"""
 	Create an account
@@ -144,6 +185,13 @@ def welcome(request):
 	request_context = RequestContext(request)
 	return render(request, "welcome.html", request_context)
 
+def thankyou(request):
+	"""
+	Shows a thank you message to the user
+	"""
+	request_context = RequestContext(request)
+	return render(request, "thankyou.html", request_context)
+
 def _get_or_create_basket(request):
 	"""
 	Helper method used to either fetch the users current shopping-basket,
@@ -161,32 +209,95 @@ def _get_or_create_basket(request):
 		basket.save()
 	return basket
 
+def _get_basket_total(basket_items):
+	"""
+	Calculate total price for all items in the basket
+	"""
+	# Sum up prices and counts for all the assets in the basket
+	#total = sum( [item.price*count for item,count in assets.iteritems()] )
+	total = 0
+	for item in basket_items:
+		total += item.asset.price * item.count
+	return total
+
 @login_required
 def basket(request):
 	"""
 	Show a page with shopping basket information
 	"""
-	basket = _get_or_create_basket(request)
+	try:
+		basket = _get_or_create_basket(request)
+	except Customer.DoesNotExist:
+		return redirect('/account/missing_info')
 	items = BasketItem.objects.filter(basket=basket)
-	# Sum up prices and counts for all the assets in the basket
-	#total = sum( [item.price*count for item,count in assets.iteritems()] )
-	total = 0
-	for item in items:
-		total += item.asset.price * item.count
+	total = _get_basket_total(items)
 
 	request_context = RequestContext(request, {
 		'items': items,
 		'total': total,
-		})
+	})
 
 	return render(request, "basket.html", request_context)
+
+@login_required
+def place_order(request):
+	try:
+		basket = _get_or_create_basket(request)
+	except Customer.DoesNotExist:
+		return redirect('/account/missing_info')
+	items = BasketItem.objects.filter(basket=basket)
+	total = _get_basket_total(items)
+
+	problems = dict()
+
+	if request.method == 'POST':
+		form = PlaceOrder(request.POST)
+		if form.is_valid():
+			# User agreed to place the order, now check stock
+			for item in items:
+				if item.count > item.asset.stock:
+					problems[item.asset.name] = "Only %d items in stock, you have ordered %d" % (item.asset.stock, item.count)
+
+			if len(problems) == 0: # No problems, order can be placed
+				# Decrease stock count, mark order as placed, a new shopping basket will automatically be created
+				# Then redirect to /order/placed
+				for item in items:
+					item.asset.stock -= item.count # TODO: Is a save() needed?
+					item.asset.save()
+
+				basket.active = False
+				basket.date_placed = datetime.now()
+				basket.save()
+
+				return redirect('/order/placed')
+
+	else:
+		form = PlaceOrder()
+	
+	request_context = RequestContext(request, {
+		'items': items,
+		'total': total,
+		'form': form,
+		'problems': problems,
+	})
+	
+	return render(request, "place_order.html", request_context)
+
+@login_required
+def order_placed(request):
+	request_context = RequestContext(request)
+	return render(request, "order_placed.html", request_context)
 
 @login_required
 def ajax_basket(request):
 	"""
 	Show a mini-page with shopping basket, used for AJAX-tooltips.
 	"""
-	basket = _get_or_create_basket(request)
+	try:
+		basket = _get_or_create_basket(request)
+	except Customer.DoesNotExist:
+		return redirect('/account/missing_info')
+
 	items = BasketItem.objects.filter(basket=basket)
 
 	request_context = RequestContext(request, {
@@ -199,10 +310,12 @@ def ajax_addproduct(request, productID):
 	"""
 	Called using an AJAX call when adding a product to the shopping basket
 	"""
-	basket = _get_or_create_basket(request)
 	try:
+		basket = _get_or_create_basket(request)
 		# Get the asset
 		asset = Asset.objects.get(pk=productID)
+	except Customer.DoesNotExist:
+		return redirect('/account/missing_info')
 	except Asset.DoesNotExist:
 		print "Product not found!"
 		return HttpResponse("Error: No such product")
@@ -221,7 +334,10 @@ def remove_product(request, itemID=-1):
 	Remove all occurences of a product (or all products, if itemID = -1) from the shopping basket. 
 	Redirects back to /basket since that is the only place it will be called from.
 	"""
-	basket = _get_or_create_basket(request)
+	try:
+		basket = _get_or_create_basket(request)
+	except Customer.DoesNotExist:
+		return redirect('/account/missing_info')
 	if itemID == -1:
 		# If itemID == -1 then all items will be removed.
 		BasketItem.objects.filter(basket=basket).delete()
@@ -241,8 +357,11 @@ def update_product_count(request, itemID, count):
 	"""
 	Change the number of instances of a specific product that exists in our database.
 	"""
-	# TODO: Obviously BasketItem needs a 'count' parameter, this needs to be changed (ffs)
-	basket = _get_or_create_basket(request)
+	try:
+		basket = _get_or_create_basket(request)
+	except Customer.DoesNotExist:
+		return redirect('/account/missing_info')
+
 	count = int(count)
 	item = BasketItem.objects.filter(basket=basket).get(asset__pk = itemID)
 	if count <= 0:

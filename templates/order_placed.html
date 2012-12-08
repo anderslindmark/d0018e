@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block overridecontent %}
+<!-- Override #wrap background color to match #main -->
+<style type="text/css">
+#wrap {
+	background: #D6E3DD;
+}
+</style>
+
+<div id="overridecontent">
+<h1>Order placed!</h1>
+
+<p><strong>Your order has now been placed</strong>, you can see order status under the order history part of your <a href="/account/me">account</a> page</p>
+
+</div>
+{% endblock %}

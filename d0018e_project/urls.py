@@ -11,22 +11,26 @@ urlpatterns = patterns('',
     # url(r'^d0018e_project/', include('d0018e_project.foo.urls')),
 
 	url(r'^$', 'shopping.views.index'),
-
 	url(r'^category/(?P<category>.+)$', 'shopping.views.showcategory'),
 	url(r'^product/(?P<productID>\d+)$', 'shopping.views.showproduct'),
 
 	url(r'^account/me$', 'shopping.views.account'),
 	url(r'^account/create$', 'shopping.views.create_account'),
-	url(r'^account/welcome$', 'shopping.views.welcome'),
+	url(r'^account/missing_info', 'shopping.views.create_customer_special'),
 	url(r'^account/login', 'django.contrib.auth.views.login',
 		{'template_name': 'login.html'}),
 	url(r'^account/logout', 'django.contrib.auth.views.logout', 
 		{'template_name': 'logout.html'}),
 
+	url(r'^account/welcome$', 'shopping.views.welcome'),
+	url(r'^account/thankyou$', 'shopping.views.thankyou'),
+
 	url(r'^basket$', 'shopping.views.basket'),
 	url(r'^basket/remove/(?P<itemID>\d+)$', 'shopping.views.remove_product'),
 	url(r'^basket/remove/all$', 'shopping.views.remove_product'),
 	url(r'^basket/update/(?P<itemID>\d+)/(?P<count>\d+)$', 'shopping.views.update_product_count'),
+	url(r'^order$', 'shopping.views.place_order'),
+	url(r'^order/placed$', 'shopping.views.order_placed'),
 
 	url(r'^ajax/basket$', 'shopping.views.ajax_basket'),
 	url(r'^ajax/addproduct/(?P<productID>\d+)$', 'shopping.views.ajax_addproduct'),

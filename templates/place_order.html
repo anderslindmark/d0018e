@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block overridecontent %}
+<!-- Override #wrap background color to match #main -->
+<style type="text/css">
+#wrap {
+	background: #D6E3DD;
+}
+</style>
+
+<div id="overridecontent">
+<h1>Confirm order</h1>
+
+{% if problems %}
+<div id="errorbox">
+<p>We found the following problems with your order:<p>
+<ul>
+	{% for item, error in problems.items %}
+	<li><strong>{{ item|capfirst }}</strong>: {{ error }}</li>
+	{% endfor %}
+</ul>
+<p>Please go back to <a href="/basket">your basket</a> and change the numbers</p>
+</div> <!-- error -->
+{% endif %}
+
+<p><strong>Please confirm that you wish to order these products:</strong></p>
+
+<table id="basket">
+	<tr>
+		<td><i>Count</i></td>
+		<td><i>Item</i></td>
+	</tr>
+	{% for item in items %}
+	<tr class="{% cycle 'odd' 'even' %}">
+		<td>{{ item.count }}</td>
+		<td><strong>{{ item.asset|capfirst }}</strong></td>
+	</tr>
+	{% endfor %}
+</table>
+
+<p>For a total sum of <i>{{ total }}</i> kr</p>
+
+<form action="/order" method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="submit" />
+</form>
+
+
+</div>
+{% endblock %}

@@ -17,7 +17,23 @@
 <p><strong>Address: </strong><br /> {{ cust.address|linebreaksbr }}</p>
 
 <h2>Order history</h2>
-<p>Lorem ipsum</p>
+{% if orders %}
+	<ul>
+	{% for order in orders %}
+		<li> <strong> Order placed: </strong> {{ order.basket.date_placed|date:"Y-m-d H:i" }} </li>
+		<strong>Items:</strong>
+		<ul>
+			{% for item in order.items %}
+			<li>{{ item.count }} x {{ item.asset.name|capfirst }}</li>
+			{% endfor %}
+		</ul>
+		<strong>Sum: </strong> <i>{{ order.total }}</i> kr
+		{% if order.basket.date_filled %}
+		<br/><strong>Order shipped: </strong> {{ order.basket.date_filled|date:"Y-m-d H:i" }}
+		{% endif %}
+	{% endfor %}
+	</ul>
+{% endif %}
 
-</div>
+</div> <!-- overridecontent -->
 {% endblock %}

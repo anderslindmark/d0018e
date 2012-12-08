@@ -71,6 +71,7 @@ body {
 	 */
 }
 
+/* Category sidebar */
 #sidebar {
 	float:left;
 	width:150px;
@@ -83,7 +84,7 @@ body {
 	display: block;
 	text-decoration:none;
 	color: #112211;
-	width: 195px; /* Don't understand how this has to be more than #sidebar->width ? */
+	width: 195px;
 	padding-left: 10px;
 	font-size: 13pt;
 }
@@ -104,6 +105,7 @@ body {
 	background: #000000;
 }
 
+/* Main content-box */
 #main {
 	float:right;
 	width:771px;
@@ -113,6 +115,7 @@ body {
 	padding:0px 15px;
 }
 
+/* Category name */
 #main .catname {
 	padding-top: 20px;
 	font-size: 24pt;
@@ -120,6 +123,7 @@ body {
 	float: left;
 }
 
+/* Category description */
 #main .catdesc {
 	font-size: 18pt;
 	font-weight: bold;
@@ -130,6 +134,7 @@ body {
 	float: right;
 }
 
+/* For pages without sidebar */
 #overridecontent {
 	margin: 20px;
 }
@@ -150,10 +155,10 @@ body {
 	text-align:right;
 }
 
+/* Ajax basket-preview box */
 #shoppingbasket {
 	position:absolute;
-	height:150;
-	width:300px;
+	width:200px;
 	background:#ddeeff;
 	background:#EEEECC;
 	border:1px solid;
@@ -163,6 +168,45 @@ body {
 	z-index: 2; /* Otherwise the shopping basket will be placed under the category-description div */
 }
 
+/* /basket and /ajax/basket: */
+table#basket {
+	border-collapse: collapse;
+	width: 50%;
+}
+table#basket th, td {
+	border: 1px solid green;
+	padding-left: 3px;
+}
+
+table#basket tr {
+	background-color: #eeeecc;
+}
+
+table#basket tr.odd {
+	background-color: #eeeeee;
+}
+
+table#basket tr.even {
+	background-color: #dddddd;
+}
+table#minibasket {
+	border-collapse: collapse;
+	width: 100%;
+}
+table#minibasket td, tr {
+	border: 1px dashed #dedede;
+	padding-left: 5px;
+}
+
+#errorbox {
+	border: 2px dashed red;
+	border-radius: 10px;
+	padding: 0px 10px;
+	display: inline-block;
+	background-color: hsla(120,65%,75%,0.3);
+}
+
+/* Animated buy-product box */
 .ui-effects-transfer {
 	border:1px dashed;
 }

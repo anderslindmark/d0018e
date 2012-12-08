@@ -3,13 +3,8 @@
 {% block js_docready %}
 $(".buyproduct").click( function() {
 $.get("/ajax/addproduct/" + this.id, function(data) {
-		// Check for "OK"
+		// TODO: Check for "OK"
 	});
-	// $(".prodbox#"+this.id).effect("transfer", {to: $("a#basket")}, 1000);
-	//$(".prodbox#" + this.id).hide();
-	//$(".prodbox#" + this.id).effect("transfer", {to: $("a#basket")}, 1000);
-	//$("a#basket").effect("pulsate", {times: 1}, 2000);
-	//$(".prodbox#" + this.id).effect("pulsate", {times: 1}, 1000);
 	$(".prodbox#" + this.id).effect("transfer", {to: $(".arrowicon")}, 750);
 
 });
@@ -24,7 +19,10 @@ $.get("/ajax/addproduct/" + this.id, function(data) {
 <div class="prodbox" id="{{product.pk}}">
 <p>
 	<strong>{{ product.name|capfirst }}</strong> 
-	- {{ product.description }} - <i>{{ product.stock }} in stock</i> 
+	- {{ product.description }} 
+	- <a href="/product/{{ product.pk }}">prodpage</a> 
+	- <i>{{ product.stock }} in stock</i> 
+	- {{ product.price }} kr
 	<button class="buyproduct" id="{{product.pk}}">Buy</button>
 </p>
 </div>

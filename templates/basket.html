@@ -1,19 +1,17 @@
 {% extends 'base.html' %}
 
 {% block js_docready %}
+	$(".upditem").click( function() {
+		inp = $("input#" + this.id);
+		count = inp.val()
+		url = "/basket/update/" + this.id + "/" + count;
+		window.location = url;
+	});
 
-$(".upditem").click( function() {
-	inp = $("input#" + this.id);
-	count = inp.val()
-	url = "/basket/update/" + this.id + "/" + count;
-	window.location = url;
-});
-
-$(".remitem").click( function() {
-	url = "/basket/remove/" + this.id;
-	window.location = url;
-});
-
+	$(".remitem").click( function() {
+		url = "/basket/remove/" + this.id;
+		window.location = url;
+	});
 {% endblock %}
 
 {% block overridecontent %}
@@ -22,34 +20,13 @@ $(".remitem").click( function() {
 #wrap {
 	background: #D6E3DD;
 }
-
-table {
-	border-collapse: collapse;
-	width: 50%;
-}
-table, th, td {
-	border: 1px solid green;
-	padding-left: 3px;
-}
-
-tr {
-	background-color: #eeeecc;
-}
-
-tr.odd {
-	background-color: #eeeeee;
-}
-
-tr.even {
-	background-color: #dddddd;
-}
-
 </style>
 
 <div id="overridecontent">
 <h1>Shopping basket</h1>
 
-<table>
+{% if items %}
+<table id="basket">
 	<tr>
 		<td><i>Item</i></td>
 		<td><i>Cost</i></td>
@@ -58,8 +35,8 @@ tr.even {
 	</tr>
 	{% for item in items %}
 	<tr class="{% cycle 'odd' 'even' %}">
-		<td>{{ item.asset|capfirst }}</td>
-		<td>{{item.asset.price}} kr</td>
+		<td><strong>{{ item.asset|capfirst }}</strong></td>
+		<td><i>{{item.asset.price}}</i> kr</td>
 		<td>
 			<input type="number" id="{{item.asset.pk}}" value="{{ item.count }}" min="0" max="99" /> 
 			<button class="upditem" id="{{item.asset.pk}}">Update</button>
@@ -76,5 +53,8 @@ tr.even {
 <a href="/order">Place order</a>
 <a href="/basket/remove/all">Clear basket</a> <!-- http://stackoverflow.com/questions/8106230/django-refresh-page-if-change-data-by-other-user -->
 </p>
+{% else %}
+<p>You have no items in your shopping basket</p>
+{% endif %}
 </div>
 {% endblock %}
