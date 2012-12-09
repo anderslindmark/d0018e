@@ -109,8 +109,7 @@ body {
 #main {
 	float:right;
 	width:771px;
-	background:#dddddd;
-	background: #D6E3DD;
+	background: #d6e3dd;
 	border-left: 1px dashed #888888;
 	padding:0px 15px;
 }
@@ -169,34 +168,35 @@ body {
 }
 
 /* /basket and /ajax/basket: */
-table#basket {
+#basket {
 	border-collapse: collapse;
 	width: 50%;
 }
-table#basket th, td {
+#basket td {
 	border: 1px solid green;
 	padding-left: 3px;
 }
 
-table#basket tr {
+#basket tr {
 	background-color: #eeeecc;
 }
 
-table#basket tr.odd {
+#basket tr.odd {
 	background-color: #eeeeee;
 }
 
-table#basket tr.even {
+#basket tr.even {
 	background-color: #dddddd;
 }
-table#minibasket {
+#minibasket {
 	border-collapse: collapse;
 	width: 100%;
 }
-table#minibasket td, tr {
+#minibasket td {
 	border: 1px dashed #dedede;
 	padding-left: 5px;
 }
+/* TODO: The tables above somehow break the login.html tables */
 
 #errorbox {
 	border: 2px dashed red;
@@ -209,4 +209,30 @@ table#minibasket td, tr {
 /* Animated buy-product box */
 .ui-effects-transfer {
 	border:1px dashed;
+}
+
+#product_list {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 20px 0px;
+}
+
+#product_list tr {
+	height: 60px;
+}
+
+#product_list img {
+	height: 50px;
+}
+
+#product_list a {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.prodrow_odd {
+	background-color: #d6e3dd;
+}
+.prodrow_even {
+	background-color: #e7f1ec;
 }
