@@ -21,6 +21,11 @@ $(".buyproduct").click( function() {
 <h1>{{ asset.name|capfirst }}</h1>
 <h2>{{ asset.description }}</h2>
 
+{% if asset.image %}
+{% load static %}
+<img src="{% get_media_prefix %}/{{ asset.image }}" />
+{% endif %}
+
 <p> This is where the detailed description will go once it is enabled</p>
 <p>(and an image should go somewhere too)</p>
 

@@ -1,4 +1,7 @@
+#!/usr/bin/env python
 #DJANGO_SETTINGS_MODULE=d0018e_project.settings python populatedb.py
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'd0018e_project.settings'
 
 from shopping.models import Customer, Category, Asset, Basket
 
@@ -18,20 +21,20 @@ shoeCat = Category.objects.get(name='shoes')
 fruitCat = Category.objects.get(name='fruit')
 telCat = Category.objects.get(name='telephones')
 products = [
-		# (name, description, category, stock)
-		('blue sock', 'An exquisite blue sock, fit for kings and queens alike', sockCat, 1, 3),
-		('green sock', 'A sock of the green persuasion', sockCat, 1, 10),
-		('gray sock', 'This sock lacks color', sockCat, 1, 7),
+		# (name, description, category, price, stock)
+		('blue sock', 'An exquisite blue sock, fit for kings and queens alike', sockCat, 10, 100),
+		('green sock', 'A sock of the green persuasion', sockCat, 10, 100),
+		('gray sock', 'This sock lacks color', sockCat, 10, 75),
 
-		('boot', 'A boot (or two boots to be specific)', shoeCat, 1, 5),
-		('loafer', 'A loafer, slip it on and forget all about it', shoeCat, 1, 3),
+		('boot', 'A boot (or two boots to be specific)', shoeCat, 25, 100),
+		('loafer', 'A loafer, slip it on and forget all about it', shoeCat, 20, 100),
 		
-		('banana', 'A yellow fruit, not very round at all', fruitCat, 1, 24),
-		('pear', 'This fruit is a bit more round than the banana', fruitCat, 1, 13),
-		('apple', "Currently this is the roundest fruit we've got!", fruitCat, 1, 7),
+		('banana', 'A yellow fruit, not very round at all', fruitCat, 8, 200),
+		('pear', 'This fruit is a bit more round than the banana', fruitCat, 7, 150),
+		('apple', "Currently this is the roundest fruit we've got!", fruitCat, 6, 200),
 
-		('fixed phone', "This is where it's at", telCat, 1, 10),
-		('mobile phone', "Everywhere is where it's at", telCat, 1, 10)
+		('fixed phone', "This is where it's at", telCat, 100, 50),
+		('mobile phone', "Everywhere is where it's at", telCat, 200, 300)
 		]
 
 for n, d, c, p, s in products:

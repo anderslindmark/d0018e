@@ -41,6 +41,7 @@ class Asset(models.Model):
 	category = models.ForeignKey(Category) # Which category does this asset belong to
 	price = models.IntegerField()
 	stock = models.IntegerField() # How many of this asset are in stock
+	image = models.ImageField(null=True, blank=True, upload_to='asset_images')
 
 	def __unicode__(self):
 		return self.name

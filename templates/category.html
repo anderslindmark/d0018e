@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block js_docready %}
 $(".buyproduct").click( function() {
 $.get("/ajax/addproduct/" + this.id, function(data) {
 		// TODO: Check for "OK"
 	});
-	$(".prodbox#" + this.id).effect("transfer", {to: $(".arrowicon")}, 750);
+	$("#prodrow" + this.id).effect("transfer", {to: $(".arrowicon")}, 750);
 
 });
 {% endblock %}
@@ -15,19 +16,17 @@ $.get("/ajax/addproduct/" + this.id, function(data) {
 <div class="catdesc">{{ category.description }}</div>
 <div id="clear"></div>
 
+<table id="product_list">
 {% for product in products %}
-<div class="prodbox" id="{{product.pk}}">
-<p>
-	<strong>{{ product.name|capfirst }}</strong> 
-	- {{ product.description }} 
-	- <a href="/product/{{ product.pk }}">prodpage</a> 
-	- <i>{{ product.stock }} in stock</i> 
-	- {{ product.price }} kr
-	<button class="buyproduct" id="{{product.pk}}">Buy</button>
-</p>
-</div>
+<tr id="prodrow{{product.pk}}" class="{% cycle 'prodrow_odd' 'prodrow_even' %}">
+		<td style="text-align: center;"> <img src="{% get_media_prefix %}{% if product.image %}{{product.image}}{% else %}blank.png{% endif %}"/></td>
+		<td> <a href="/product/{{ product.pk }}">{{ product.name|capfirst }}</a> </td>
+		<td> {{ product.description }} </td>
+		<td> {{ product.stock }} in stock</td>
+		<td> {{ product.price }} kr</td>
+		<td style="text-align: right;"> <button class="buyproduct" id="{{product.pk}}">Buy</button> </td>
+	</tr>
 	<!--  http://stackoverflow.com/questions/8106230/django-refresh-page-if-change-data-by-other-user -->
 {% endfor %}
-
-
+</table>
 {% endblock %}

@@ -37,7 +37,6 @@ urlpatterns = patterns('',
 	url(r'^ajax/basket$', 'shopping.views_basket.ajax_basket'),
 	url(r'^ajax/addproduct/(?P<productID>\d+)$', 'shopping.views_basket.ajax_addproduct'),
 
-
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
