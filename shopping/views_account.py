@@ -4,19 +4,18 @@ from django.contrib.auth.models import User
 from shopping.models import Category, Asset, Customer, Basket, BasketItem
 from shopping.local_forms import CreateUser, CreateCustomer, PlaceOrder
 from shopping.views_helpers import get_basket_total
+from shopping.views_helpers import customer_required
 from django.template import RequestContext
 from django.shortcuts import render, redirect
 
 
 @login_required
+@customer_required
 def show_account(request):
 	"""
 	Show a page with account information and order history.
 	"""
-	try:
-		cust = Customer.objects.get(user=request.user)
-	except Customer.DoesNotExist:
-		return redirect('/account/missing_info')
+	cust = Customer.objects.get(user=request.user)
 
 	baskets = Basket.objects.filter(customer=cust).filter(active=False)
 	orders = []

@@ -15,7 +15,7 @@ urlpatterns = patterns('',
 	url(r'^product/(?P<productID>\d+)$', 'shopping.views.showproduct'),
 
 	# Account-related pages
-	url(r'^account/me$', 'shopping.views_account.show_account'),
+	url(r'^account$', 'shopping.views_account.show_account'),
 	url(r'^account/create$', 'shopping.views_account.create_account'),
 	url(r'^account/missing_info', 'shopping.views_account.create_missing_customer'),
 	url(r'^account/welcome$', 'shopping.views.welcome'),

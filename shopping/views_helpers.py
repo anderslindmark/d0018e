@@ -1,4 +1,5 @@
 from shopping.models import Category, Asset, Customer, Basket, BasketItem
+from django.shortcuts import redirect
 
 def get_categories(request, current=None):
 	"""
@@ -7,7 +8,7 @@ def get_categories(request, current=None):
 	"""
 	# TODO: This does not use current yet
 	# Get Categories
-	current_category = request.session.get('current_category') # ??
+	#current_category = request.session.get('current_category') # ??
 	categories = Category.objects.all()
 	if current is not None:
 		for cat in categories:
@@ -43,3 +44,18 @@ def get_basket_total(basket_items):
 		total += item.asset.price * item.count
 	return total
 
+
+def customer_required(func, redirect_url='/account/missing_info'):
+	"""
+	Decorator that removes the need for manual missing-customer checks
+	everywhere
+	"""
+	# This inner function runs the decorated function with some checks
+	def check(request, *args, **kwargs):
+		try:
+			return func(request, *args, **kwargs)
+		except Customer.DoesNotExist:
+			return redirect(redirect_url)
+	
+	# Return the modified function 
+	return check

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from shopping.models import Category, Asset, Customer, Basket, BasketItem
 from shopping.local_forms import CreateUser, CreateCustomer, PlaceOrder
 from shopping.views_helpers import get_or_create_basket, get_basket_total
+from shopping.views_helpers import customer_required
 from django.template import RequestContext
 from django.shortcuts import render, redirect
 
@@ -11,14 +12,12 @@ from datetime import datetime
 
 
 @login_required
+@customer_required
 def basket(request):
 	"""
 	Show a page with shopping basket information
 	"""
-	try:
-		basket = get_or_create_basket(request)
-	except Customer.DoesNotExist:
-		return redirect('/account/missing_info')
+	basket = get_or_create_basket(request)
 	items = BasketItem.objects.filter(basket=basket)
 	total = get_basket_total(items)
 
@@ -31,15 +30,14 @@ def basket(request):
 
 
 @login_required
+@customer_required
 def remove_product(request, itemID=-1):
 	"""
 	Remove all occurences of a product (or all products, if itemID = -1) from the shopping basket. 
 	Redirects back to /basket since that is the only place it will be called from.
 	"""
-	try:
-		basket = get_or_create_basket(request)
-	except Customer.DoesNotExist:
-		return redirect('/account/missing_info')
+	basket = get_or_create_basket(request)
+
 	if itemID == -1:
 		# If itemID == -1 then all items will be removed.
 		BasketItem.objects.filter(basket=basket).delete()
@@ -56,14 +54,12 @@ def remove_product(request, itemID=-1):
 
 
 @login_required
+@customer_required
 def update_product_count(request, itemID, count):
 	"""
 	Change the number of instances of a specific product that exists in our database.
 	"""
-	try:
-		basket = get_or_create_basket(request)
-	except Customer.DoesNotExist:
-		return redirect('/account/missing_info')
+	basket = get_or_create_basket(request)
 
 	count = int(count)
 	item = BasketItem.objects.filter(basket=basket).get(asset__pk = itemID)
@@ -77,11 +73,9 @@ def update_product_count(request, itemID, count):
 
 
 @login_required
+@customer_required
 def place_order(request):
-	try:
-		basket = get_or_create_basket(request)
-	except Customer.DoesNotExist:
-		return redirect('/account/missing_info')
+	basket = get_or_create_basket(request)
 	items = BasketItem.objects.filter(basket=basket)
 	total = get_basket_total(items)
 
@@ -127,14 +121,12 @@ def order_placed(request):
 
 
 @login_required
+@customer_required
 def ajax_basket(request):
 	"""
 	Show a mini-page with shopping basket, used for AJAX-tooltips.
 	"""
-	try:
-		basket = get_or_create_basket(request)
-	except Customer.DoesNotExist:
-		return redirect('/account/missing_info')
+	basket = get_or_create_basket(request)
 
 	items = BasketItem.objects.filter(basket=basket)
 
@@ -145,6 +137,7 @@ def ajax_basket(request):
 
 
 @login_required
+@customer_required
 def ajax_addproduct(request, productID):
 	"""
 	Called using an AJAX call when adding a product to the shopping basket
@@ -153,8 +146,6 @@ def ajax_addproduct(request, productID):
 		basket = get_or_create_basket(request)
 		# Get the asset
 		asset = Asset.objects.get(pk=productID)
-	except Customer.DoesNotExist:
-		return redirect('/account/missing_info')
 	except Asset.DoesNotExist:
 		print "Product not found!"
 		return HttpResponse("Error: No such product")
