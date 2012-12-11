@@ -1,0 +1,19 @@
+{% if comments %}
+	{% for comment in comments %}
+	<div id="comment" class="{% cycle 'comment_odd' 'comment_even' %}">
+		<div class="comment_header" id="comment_timestamp">
+			{{ comment.timestamp|date:"Y-m-d H:i:s" }}
+		</div>
+		<div class="comment_header" id="comment_user">
+			{{ comment.customer }}
+		</div>
+		<div id="clear"></div>
+		<div id="comment_content">
+			<pre>{{ comment.comment }}</pre>
+		</div>
+	</div>
+
+	{% endfor %}
+{% else %}
+	No comments yet
+{% endif %}

@@ -236,3 +236,71 @@ body {
 .prodrow_even {
 	background-color: #e7f1ec;
 }
+
+.commentsection > #comment {
+	width: 100%;
+}
+
+#comment {
+	margin-left: -14px;
+	display: inline-block;
+	padding-left: 15px;
+}
+
+#comment > #comment_user {
+	float: left;
+	display: inline-block;
+	font-weight: bold;
+}
+
+#comment > #comment_timestamp {
+	float: right;
+	margin-right: 10px;
+	display: inline-block;
+	font-style: italic;
+}
+
+#comment > #comment_content {
+	margin-left: 10px;
+}
+
+.comment_odd {
+	background-color: #e4eae4;
+}
+
+.comment_even {
+	background-color: #d6e3dd;
+	background-color: #cfdcd6;
+}
+
+hr {
+	width: 100%;
+	border: 0px;
+	height: 1px;
+	background: black;
+}
+
+.commenttitle {
+	font-size: 18pt;
+	font-weight: bold;
+	float: left;
+	display: inline-block;
+	margin-bottom: 10px;
+}
+.addcomment {
+	float: right;
+	display: inline-block;
+}
+
+.newcomment {
+	display: none;
+	margin-top: 50px;
+	width: 100%;
+}
+
+#comment_content pre {
+	margin-top: 0px;
+	font-family:Helvetica,Arial,Sans-serif;
+	font-size: 12pt;
+}
+

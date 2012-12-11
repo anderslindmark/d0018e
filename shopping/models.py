@@ -82,6 +82,9 @@ class Grade(models.Model):
 	count = models.IntegerField(default=0)	# Total number of grades
 	sum = models.IntegerField(default=0)	# Total sum of all grades
 
+	def __unicode__(self):
+		return "Grade (" + str(self.asset) + "): " + str(self.sum/float(self.count)) + ", " + str(self.count) + " votes"
+
 class GradeHistory(models.Model):
 	"""
 	A customers rating-history
@@ -89,3 +92,17 @@ class GradeHistory(models.Model):
 	customer = models.ForeignKey(Customer)
 	history = models.CharField(max_length=1000, default="")
 
+	def __unicode__(self):
+		return "Rating history for " + str(self.customer.user.username)
+
+class Comment(models.Model):
+	"""
+	Comment on a product
+	"""
+	asset = models.ForeignKey(Asset)
+	customer = models.ForeignKey(Customer)
+	timestamp = models.DateTimeField(auto_now_add=True)
+	comment = models.CharField(max_length=500)
+
+	def __unicode(self):
+		return str(self.customer.user.username) + " -> " + str(self.asset) + " @ " + str(self.timestamp)

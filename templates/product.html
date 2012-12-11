@@ -30,6 +30,29 @@ $(".do_grade").click( function() {
 		}
 	});
 });
+
+$(".addcomment").click( function() {
+	$(".newcomment").toggle();
+});
+
+$(".submitcomment").click( function() {
+	url = "/ajax/comments/add/" + this.id;
+	comment = $("#newcomment_content").val();
+	$.post(url, {'comment': comment}, function(data) {
+		if (data == "OK")
+		{
+			location.reload();
+		}
+		else
+		{
+			alert(data);
+		}
+	});
+});
+
+//class="commentsection" id="{{ asset.pk }}
+id = $(".commentsection").attr("id");
+$(".commentsection").load("/ajax/comments/" + id);
 {% endblock %}
 
 {% block main %}
@@ -47,9 +70,15 @@ $(".do_grade").click( function() {
 <p>{{ asset.price }} kr</p>
 <button class="buyproduct" id="{{ asset.pk }}">Buy</button>
 
+
+<div id="rating">
+	<h3>Rating</h3>
 {% if rating %}
-<p>Grade: {{ rating.0 }} ({{rating.1}} votes)</p>
+Grade: {{ rating.0 }} ({{rating.1}} votes)
+{% else %}
+This product has no rating yet
 {% endif %}
+</div>
 <!-- TODO: Only show this for logged in users -->
 <p>Rate this product:<select id="grade">
 		<option value="1">1</option>
@@ -60,4 +89,16 @@ $(".do_grade").click( function() {
 	</select>
 	<button class="do_grade" id="{{ asset.pk }}">Rate</button>
 </p>
+<hr/>
+<div class="commenttitle">Comments</div>
+<div class="addcomment" id="{{ asset.pk }}">
+	<a href="javscript:void();">Add comment</a>
+</div>
+<div class="newcomment">
+	<textarea id="newcomment_content" rows="7" cols="71"></textarea>
+	<button class="submitcomment" id="{{ asset.pk }}">Comment</button>
+</div>
+<div class="commentsection" id="{{ asset.pk }}">
+	Loading comments...
+</div>
 {% endblock %}

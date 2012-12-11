@@ -2,12 +2,13 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
-from shopping.models import Category, Asset, Customer, Basket, BasketItem, Grade, GradeHistory
+from shopping.models import Category, Asset, Customer, Basket, BasketItem, Grade, GradeHistory, Comment
 from shopping.local_forms import CreateUser, CreateCustomer, PlaceOrder
-from shopping.views_helpers import get_categories, get_or_create_basket, get_basket_total, add_rating, get_rating
+from shopping.views_helpers import get_categories, get_or_create_basket, get_basket_total, add_rating, get_rating, fetch_comments
 from shopping.views_helpers import customer_required
 from django.template import RequestContext
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 
 # TODO: Write a @basket_required-decorator, 
 #   alternatively a @customer_and_basket_required which redirects to /account_missing_info and later creates baskets (overkill?)
@@ -152,4 +153,39 @@ def asset_getgrade(request, productID):
 		return HttpResponse(str(grade))
 	else:
 		return HttpResponse("No ratings")
+
+def get_comments(request, productID):
+	"""
+	Retrieve a list of comments for a specific product
+	"""
+	comments = fetch_comments(productID)
+	request_context = RequestContext(request, {
+				'comments': comments,
+		})
+	return render(request, "comments.html", request_context)
+
+@login_required
+@csrf_exempt
+def add_comment(request, productID):
+	"""
+	Add a comment to a product. Comment content is expected to be in POST data
+	"""
+	if not request.method == 'POST':
+		return HttpResponse("NOOOOOO!")
+	else:
+		comment = request.POST['comment']
+		if len(comment) < 10:
+			return HttpResponse("Comment needs to been 10 characters or longer")
+		try:
+			asset = Asset.objects.get(pk = productID)
+			customer = Customer.objects.get(user=request.user)
+		except Asset.DoesNotExist:
+			return HttpResponse("No such product")
+		except Customer.DoesNotExist:
+			return HttpResponse("Please fill in your account information")
+		comment = Comment(asset=asset, customer=customer, comment=comment)
+		comment.save()
+		return HttpResponse("OK")
+		
+
 

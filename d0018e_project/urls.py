@@ -37,7 +37,9 @@ urlpatterns = patterns('',
 	url(r'^ajax/basket$', 'shopping.views_basket.ajax_basket'),
 	url(r'^ajax/addproduct/(?P<productID>\d+)$', 'shopping.views_basket.ajax_addproduct'),
 	url(r'^ajax/addrating/(?P<productID>\d+)/(?P<grade>\d+)$', 'shopping.views.asset_addgrade'),
-	url(r'^ajax/getgrade/(?P<productID>\d+)$', 'shopping.views.asset_getgrade'),
+	#url(r'^ajax/getgrade/(?P<productID>\d+)$', 'shopping.views.asset_getgrade'),
+	url(r'^ajax/comments/add/(?P<productID>\d+)$', 'shopping.views.add_comment'),
+	url(r'^ajax/comments/(?P<productID>\d+)$', 'shopping.views.get_comments'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

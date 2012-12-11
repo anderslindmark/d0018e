@@ -1,4 +1,4 @@
-from shopping.models import Category, Asset, Customer, Basket, BasketItem, Grade, GradeHistory
+from shopping.models import Category, Asset, Customer, Basket, BasketItem, Grade, GradeHistory, Comment
 from django.shortcuts import redirect
 
 def get_categories(request, current=None):
@@ -118,4 +118,20 @@ def get_rating(productID):
 	else:
 		grade = grade_obj.sum/float(grade_obj.count)
 		return (grade, grade_obj.count)
+
+def fetch_comments(productID):
+	"""
+	Retrieve a list of comments for a product. Returns False if no comments are available
+	"""
+	try:
+		comments = Comment.objects.filter(asset__pk = productID).order_by('-timestamp')
+	except Comment.DoesNotExist:
+		return False
+	return comments
+
+
+
+
+
+
 
