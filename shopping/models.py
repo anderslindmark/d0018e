@@ -73,3 +73,19 @@ class BasketItem(models.Model):
 
 	def __unicode__(self):
 		return str(self.basket) + ": " + str(self.count) + " * " + str(self.asset)
+
+class Grade(models.Model):
+	"""
+	Product ratings
+	"""
+	asset = models.ForeignKey(Asset)
+	count = models.IntegerField(default=0)	# Total number of grades
+	sum = models.IntegerField(default=0)	# Total sum of all grades
+
+class GradeHistory(models.Model):
+	"""
+	A customers rating-history
+	"""
+	customer = models.ForeignKey(Customer)
+	history = models.CharField(max_length=1000, default="")
+

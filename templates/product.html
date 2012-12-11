@@ -12,8 +12,23 @@ $(".buyproduct").click( function() {
 		{
 			alert(data);
 		}
-        // TODO: Check for "OK"
     });
+});
+
+$(".do_grade").click( function() {
+	rating = $("#grade").val();
+	url = "/ajax/addrating/" + this.id + "/" + rating;
+	$.get(url, function(data)
+	{
+		if (data == "Denied")
+		{
+			alert("You have already rated this product");
+		}
+		else
+		{
+			alert("Thank you for voting!"); // TODO: Something other than alert()
+		}
+	});
 });
 {% endblock %}
 
@@ -32,4 +47,17 @@ $(".buyproduct").click( function() {
 <p>{{ asset.price }} kr</p>
 <button class="buyproduct" id="{{ asset.pk }}">Buy</button>
 
+{% if rating %}
+<p>Grade: {{ rating.0 }} ({{rating.1}} votes)</p>
+{% endif %}
+<!-- TODO: Only show this for logged in users -->
+<p>Rate this product:<select id="grade">
+		<option value="1">1</option>
+		<option value="2">2</option>
+		<option value="3">3</option>
+		<option value="4">4</option>
+		<option value="5">5</option>
+	</select>
+	<button class="do_grade" id="{{ asset.pk }}">Rate</button>
+</p>
 {% endblock %}

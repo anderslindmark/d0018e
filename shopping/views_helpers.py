@@ -1,4 +1,4 @@
-from shopping.models import Category, Asset, Customer, Basket, BasketItem
+from shopping.models import Category, Asset, Customer, Basket, BasketItem, Grade, GradeHistory
 from django.shortcuts import redirect
 
 def get_categories(request, current=None):
@@ -59,3 +59,63 @@ def customer_required(func, redirect_url='/account/missing_info'):
 	
 	# Return the modified function 
 	return check
+
+def add_rating(customer, productID, rating):
+	try:
+		gradehist = GradeHistory.objects.get(customer=customer)
+	except GradeHistory.DoesNotExist:
+		# First time the customer rates something, create GradeHistory
+		gradehist = GradeHistory(customer=customer)
+		gradehist.save()
+	
+	history_list = gradehist.history.split(',') # ['1', '2', '9']
+	if str(productID) in history_list:
+		# User has already rated this product
+		return False
+	else:
+		# User has not already rated this product. At least not recently
+		# Try to get existing ratings
+		try:
+			grade = Grade.objects.get(asset__pk = productID)
+		except Grade.DoesNotExist:
+			try:
+				asset = Asset.objects.get(pk = productID)
+			except Asset.DoesNotExist:
+				return False
+			grade = Grade(asset = asset)
+		grade.count += 1
+		grade.sum += rating
+		grade.save()
+		# Add this to the rating history
+		print repr(history_list)
+		if gradehist.history == "":
+			gradehist.history = str(productID)
+		else:
+			history_list.append(str(productID))
+			print repr(history_list)
+			history = ','.join(history_list)
+			while len(history) > 1000:
+				# History is too long, cut of first element until length is good
+				history = history[ history.find(',')+1 : ]
+			gradehist.history = history
+		gradehist.save()
+		return True
+
+def get_rating(productID):
+	"""
+	Retrieve the rating for a product. Returns False if no ratings are available
+	"""
+	try:
+		grade_obj = Grade.objects.get(asset__pk = productID)
+	except Grade.DoesNotExist:
+		try:
+			asset = Asset.objects.get(pk = productID)
+		except Asset.DoesNotExist:
+			return False
+		grade_obj = Grade(asset = asset)
+	if grade_obj.count == 0:
+		return False
+	else:
+		grade = grade_obj.sum/float(grade_obj.count)
+		return (grade, grade_obj.count)
+
