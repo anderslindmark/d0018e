@@ -7,7 +7,9 @@
 	</tr>
 	{% endfor %}
 </table>
-<a href="/basket/remove/all">Clear basket</a> <!-- TODO: /ajax/clearbasket instead, so it doesn't redirect -->
+<div id="ajax_clearbasket">
+	<a href="/basket/remove/all">Clear basket</a> <!-- TODO: /ajax/clearbasket instead, so it doesn't redirect -->
+</div>
 {% else %}
 Your basket is empty
 {% endif %}

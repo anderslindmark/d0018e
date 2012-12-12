@@ -304,3 +304,26 @@ hr {
 	font-size: 12pt;
 }
 
+.cluetip-close {
+	display: none;
+	width: 0px;
+	height: 0px;
+}
+
+#ajax_clearbasket {
+	margin-top: 10px;
+	margin-bottom: 5px;
+	display: inline-block;
+	float: right;
+}
+
+.cluetip-baskethover {
+	background: #eeeeee;
+	border-radius: 5px;
+}
+.cluetip-baskethover .ui-cluetip-header  {
+	background-color: #dddddd;
+	height: 10px;
+	padding-top: 5px;
+	text-align: center;
+}

@@ -5,9 +5,10 @@
 <title>The Amazing Webshop</title>
 <link rel="stylesheet" type="text/css" href="/static/style.css" />
 <script src="/static/lib/jquery.min.js"></script>
+<script src="/static/lib/jquery-ui.min.js"></script>
 <script src="/static/lib/jquery.ui.position.min.js"></script> <!-- http://docs.jquery.com/UI/API/1.8/Position -->
 <script src="/static/lib/jquery.hoverIntent.minified.js"></script> <!-- http://cherne.net/brian/resources/jquery.hoverIntent.html -->
-<script src="/static/lib/jquery-ui.min.js"></script>
+<script src="/static/lib/jquery.cluetip.js"></script> <!-- https://github.com/kswedberg/jquery-cluetip -->
 <script>	
 	function showBasket() {
 		$("#shoppingbasket").load('/ajax/basket');
@@ -35,16 +36,28 @@
 	};
 
 	$(document).ready(function(){
-		$("#basket").hoverIntent(shopping_hover_conf);
+		// $("#basket").hoverIntent(shopping_hover_conf);
 
-		$("#basket.arrowicon").click( function(event) {
-			alert("Hej");
+		$("#basket").cluetip({
+			showTitle: true,
+			positionBy: 'bottomTop',
+			hoverIntent: false,
+			sticky: true,
+			mouseOutClose: true,
+			cluetipClass: 'baskethover',
+			closeText: 'x',
+			hideLocal: true,
+
+			fx: {
+				open:       'fadeIn', // can be 'show' or 'slideDown' or 'fadeIn'
+				openSpeed:  '250'
+			},
 		});
-
 		{% block js_docready %}{% endblock %}
 
 	});
 </script>
+<link rel="stylesheet" type="text/css" href="/static/jquery.cluetip.css" />
 </head>
 
 <body>
@@ -56,7 +69,7 @@
 		<!-- TODO: Make these linkable divs, like the sidebar, so that everything fits better and so that basket-hover is more natural -->
 		<li><a href="/">Home</a></li>
 		{% if user.is_authenticated %}
-			<li><a id="basket" href="/basket">Shopping Basket</a><span class="arrowicon" style="display:inline-block;"></span></li> <!-- Or nothing -->
+			<li ><a id="basket" href="/basket" rel="/ajax/basket" title="Basket">Shopping Basket</a><span class="arrowicon" style="display:inline-block;"></span></li> <!-- Or nothing -->
 			<li><a href="/account">My Account</a></li>
 			<li><a href="/account/logout">Log out</a></li>
 		{% else %}

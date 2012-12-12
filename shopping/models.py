@@ -104,5 +104,5 @@ class Comment(models.Model):
 	timestamp = models.DateTimeField(auto_now_add=True)
 	comment = models.CharField(max_length=500)
 
-	def __unicode(self):
-		return str(self.customer.user.username) + " -> " + str(self.asset) + " @ " + str(self.timestamp)
+	def __unicode__(self):
+		return str(self.customer.user.username) + " -> " + str(self.asset) + " @ " + str(self.timestamp) + ": \"" + unicode(self.comment) + "\""
