@@ -4,40 +4,14 @@
 <head>
 <title>The Amazing Webshop</title>
 <link rel="stylesheet" type="text/css" href="/static/style.css" />
+<link rel="stylesheet" type="text/css" href="/static/jquery.cluetip.css" />
 <script src="/static/lib/jquery.min.js"></script>
 <script src="/static/lib/jquery-ui.min.js"></script>
 <script src="/static/lib/jquery.ui.position.min.js"></script> <!-- http://docs.jquery.com/UI/API/1.8/Position -->
 <script src="/static/lib/jquery.hoverIntent.minified.js"></script> <!-- http://cherne.net/brian/resources/jquery.hoverIntent.html -->
 <script src="/static/lib/jquery.cluetip.js"></script> <!-- https://github.com/kswedberg/jquery-cluetip -->
 <script>	
-	function showBasket() {
-		$("#shoppingbasket").load('/ajax/basket');
-		$("#shoppingbasket").slideToggle();
-		$("#shoppingbasket").position({
-			my: "right top",
-			at: "right bottom",
-			of: "a#basket",
-			collision: "none",
-			offset: "0 5"
-		});
-	}
-
-	function hideBasket() {
-		// Do nothing, mouseOver again instead to hide.
-		// This is because you want to be able to interact with the basket.
-		// TODO: Make the basket-popup a child?
-		// 		 Or make it a click-to-toggle type of thing with an arrow-icon next to the basket-link
-	}
-
-	var shopping_hover_conf = {
-		over: showBasket,
-		timeout: 500,
-		out: hideBasket
-	};
-
 	$(document).ready(function(){
-		// $("#basket").hoverIntent(shopping_hover_conf);
-
 		$("#basket").cluetip({
 			showTitle: true,
 			positionBy: 'bottomTop',
@@ -54,10 +28,8 @@
 			},
 		});
 		{% block js_docready %}{% endblock %}
-
 	});
 </script>
-<link rel="stylesheet" type="text/css" href="/static/jquery.cluetip.css" />
 </head>
 
 <body>
@@ -66,7 +38,6 @@
 	
 <div id="nav">
 	<ul>
-		<!-- TODO: Make these linkable divs, like the sidebar, so that everything fits better and so that basket-hover is more natural -->
 		<li><a href="/">Home</a></li>
 		{% if user.is_authenticated %}
 			<li ><a id="basket" href="/basket" rel="/ajax/basket" title="Basket">Shopping Basket</a><span class="arrowicon" style="display:inline-block;"></span></li> <!-- Or nothing -->
@@ -78,10 +49,6 @@
 		{% endif %}
 	</ul>
 </div> <!-- nav -->
-
-<div id="shoppingbasket">
-	<i>Loading basket ...</i>
-</div> <!-- shoppingbasket -->
 
 {% block overridecontent %}
 <div id="sidebar">

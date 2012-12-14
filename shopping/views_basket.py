@@ -93,7 +93,7 @@ def place_order(request):
 				# Decrease stock count, mark order as placed, a new shopping basket will automatically be created
 				# Then redirect to /order/placed
 				for item in items:
-					item.asset.stock -= item.count # TODO: Is a save() needed?
+					item.asset.stock -= item.count
 					item.asset.save()
 
 				basket.active = False

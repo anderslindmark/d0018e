@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from shopping.models import Category, Asset, Customer, Basket, BasketItem
-from shopping.local_forms import CreateUser, CreateCustomer, PlaceOrder
+from shopping.local_forms import CreateUser, CreateCustomer, PlaceOrder, EditAccount
 from shopping.views_helpers import get_basket_total
 from shopping.views_helpers import customer_required
 from django.template import RequestContext
@@ -115,4 +115,43 @@ def create_missing_customer(request):
 		form = CreateCustomer()
 	request_context = RequestContext(request, {'form': form})
 	return render(request, "create_customer.html", request_context)
+
+@login_required
+@customer_required
+def edit_account(request):
+	"""
+	This is called if the current user does not have a Customer-object associated to it
+	"""
+	cust = Customer.objects.get(user = request.user)
+	if request.method == 'POST':
+		form = EditAccount(request.POST)
+		if form.is_valid():
+			first_name = form.cleaned_data['first_name']
+			last_name = form.cleaned_data['last_name']
+			email = form.cleaned_data['email']
+			address = form.cleaned_data['address']
+			phone_number = form.cleaned_data['phone_number']
+			# TODO: Validate these
+			user = request.user
+			user.first_name = first_name
+			user.last_name = last_name
+			user.email = email
+			user.save()
+			cust.address = address
+			cust.phone_number = phone_number
+			cust.save()
+			return redirect('/account')
+	else:
+		# Load existing data into form
+		initial_data = {
+				'first_name':  request.user.first_name,
+				'last_name': request.user.last_name,
+				'email': request.user.email,
+				'address': cust.address,
+				'phone_number': cust.phone_number
+		}
+		form = EditAccount(initial_data)
+
+	request_context = RequestContext(request, {'form': form})
+	return render(request, "edit_account.html", request_context)
 

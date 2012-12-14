@@ -6,9 +6,7 @@ def get_categories(request, current=None):
 	Helper to setup the category list and make sure that the currently selected category persists 
 	through the browsing session.
 	"""
-	# TODO: This does not use current yet
 	# Get Categories
-	#current_category = request.session.get('current_category') # ??
 	categories = Category.objects.all()
 	if current is not None:
 		for cat in categories:
@@ -128,10 +126,4 @@ def fetch_comments(productID):
 	except Comment.DoesNotExist:
 		return False
 	return comments
-
-
-
-
-
-
 

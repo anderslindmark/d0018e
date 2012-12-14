@@ -27,11 +27,13 @@ $(".do_grade").click( function() {
 		else
 		{
 			alert("Thank you for voting!"); // TODO: Something other than alert()
+			location.reload();
 		}
 	});
 });
 
-$(".addcomment").click( function() {
+$(".addcomment").click( function(event) {
+	event.preventDefault(); /* Don't follow href */
 	$(".newcomment").toggle();
 });
 
@@ -41,16 +43,19 @@ $(".submitcomment").click( function() {
 	$.post(url, {'comment': comment}, function(data) {
 		if (data == "OK")
 		{
-			location.reload();
+			$(".newcomment").hide(); /* Hide the comment box */
+			$("#newcomment_content").val(""); /* Reset the comment field */
+			$(".commentsection").load("/ajax/comments/" + id); /* Update the comment area */
+
 		}
 		else
 		{
+			/* There was a problem adding the comment, display error dialog */
 			alert(data);
 		}
 	});
 });
 
-//class="commentsection" id="{{ asset.pk }}
 id = $(".commentsection").attr("id");
 $(".commentsection").load("/ajax/comments/" + id);
 {% endblock %}
@@ -74,12 +79,13 @@ $(".commentsection").load("/ajax/comments/" + id);
 <div id="rating">
 	<h3>Rating</h3>
 {% if rating %}
-Grade: {{ rating.0 }} ({{rating.1}} votes)
+Grade: {{ rating.0|floatformat }} ({{rating.1}} votes)
 {% else %}
 This product has no rating yet
 {% endif %}
 </div>
 <!-- TODO: Only show this for logged in users -->
+{% if user.is_authenticated %}
 <p>Rate this product:<select id="grade">
 		<option value="1">1</option>
 		<option value="2">2</option>
@@ -98,6 +104,7 @@ This product has no rating yet
 	<textarea id="newcomment_content" rows="7" cols="71"></textarea>
 	<button class="submitcomment" id="{{ asset.pk }}">Comment</button>
 </div>
+{% endif %}
 <div class="commentsection" id="{{ asset.pk }}">
 	Loading comments...
 </div>

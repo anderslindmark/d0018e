@@ -327,3 +327,20 @@ hr {
 	padding-top: 5px;
 	text-align: center;
 }
+
+#orderhistory {
+		width: 75%;
+		border-collapse: collapse;
+		margin-bottom: 15px;
+}
+
+#orderhistory #oh_header {
+	background-color: #EEC;
+	text-align: center;
+	font-size: 14pt;
+}
+#orderhistory td {
+		border: 1px solid gray;
+		padding-left: 5px;
+		background-color: #eee;
+}
