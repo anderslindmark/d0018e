@@ -15,7 +15,7 @@
 \usepackage{fullpage}
 
 \usepackage{float}
-
+\usepackage[T1]{fontenc}
 % Uncomment some of the following if you use the features
 %
 % Running Headers and footers
@@ -77,7 +77,8 @@
 \usepackage{color}
 \definecolor{error}{RGB}{193,27,23} % #C11B17, Firebrick3
 \definecolor{warning}{RGB}{229,103,23} % #E56717, Dark Orange2
-\definecolor{codebg}{RGB}{245,245,245}
+%\definecolor{codebg}{RGB}{245,245,245}
+\definecolor{codebg}{RGB}{247,247,247}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{poop}{rgb}{0.82,0.71,0.15}
 
@@ -110,7 +111,7 @@ extendedchars=\true,
 %basicstyle=\small,
 basicstyle=\small,
 commentstyle=\color{red},
-numberstyle=\footnotesize,
+numberstyle=\footnotesize\color{gray},
 stringstyle=\color{poop},
 breaklines=true,
 %keywordstyle=\color{black}\bfseries,
@@ -130,7 +131,7 @@ numbers=left,
 \ 
 \begin{center}
 \vfill
-{\huge\sffamily D0018E Report (2)}
+{\huge\sffamily D0018E Report (3+4)}
 \rule{\linewidth}{0.3mm}\\
 Anders Lindmark \\
 \vfill
@@ -307,8 +308,6 @@ ALTER TABLE `shopping_order_assets` ADD CONSTRAINT `order_id_refs_id_29c844c0` F
 Here you can also see how it adds relationships between the tables.
 
 \subsection{The website}
-I would like to prefix this part by stating that I am not a good designer,
-so the webpage that you see might make your eyes hurt a bit.
 
 \subsubsection{Tools}
 At its current state, the website uses HTML, CSS and JavaScript. 
@@ -339,8 +338,7 @@ basket link which toggles the visibility of a \emph{\lstinline{<div>}}-container
 In the future this will be done using an ajax call to a webpage that displays
 information about the customers current shopping basket.
 
-The website in it's current state can be seen here: \url{http://localghost.net/d0018e/1/}. 
-A small screenshot can be seen in figure \ref{fig:sshot}.
+A small screenshot of the website when it was only static HTML can be seen in figure \ref{fig:sshot}.
 \begin{figure}
 \centering
 \includegraphics[width=10cm]{Screenshot_2012-11-16.png}
@@ -360,8 +358,96 @@ and for positioning the shopping-basket information I used this addon:
 \url{http://docs.jquery.com/UI/API/1.8/Position}
 
 \subsubsection{Converting the page to Django-templates}
-The static skeleton-page has been converted into Django-templates.\todo[inline]{TODO: Include code and examples of the templates and show how inheritance, content-blocks etc works in Django}
+The static skeleton-page has been converted into Django-templates.
 
+Django rendering of pages consists of a few steps. First a url is defined in the
+file \emph{urls.py}. This definition consists of a regexp that the url is matched
+against and which method that should be invoked to handle the request.
+\lstset{numbers=none}
+\begin{lstlisting}
+url(r'^ajax/addrating/(?P<productID>\d+)/(?P<grade>\d+)$',
+	'shopping.views.asset_addgrade')}
+\end{lstlisting}
+\lstset{numbers=left}
+In our project this means that the function \emph{asset\_addgrade()} in the module \emph{shopping} and the file \emph{views.py} is called when this url
+is matched.
+
+The regexp-groups in the url definition extract information from the url
+and passes this information to the handler function. In our example the url
+\emph{/ajax/addrating/1/4} would result in the function call:
+\lstinline{asset_addgrade(request, productID=1, grade=4)}.
+This function is expected to return an HTML response which it does
+by gathering information from the request and from the database and what
+other sources there might be and places this information in a context. 
+It then renders a Django-template using this context and the output from the
+render function is sent back to the client.
+
+Django templating works by defining a template in a language that extends
+HTML. The extension consists of certain tags that the template engine can
+use to replace values or blocks of code. The template language supports
+inheritance, so the user can define a base-file that contains all style-sheet and
+javascript includes, the header, the footer, navigation etc and then use smaller
+templates that extend this base-template to deal with the actual sub-pages of
+the site.
+
+An example of one of the sub-pages from the project looks like this:
+\lstset{language=HTML}
+\begin{lstlisting}
+{% extends 'base.html' %}
+
+{% block js_docready %}
+$(".buyproduct").click( function() {
+$.get("/ajax/addproduct/" + this.id, function(data) {}); 
+    $("#prodrow" + this.id).effect("transfer", {to: $(".arrowicon")}, 750);
+});
+{% endblock %}
+ 
+{% block main %}
+<div class="catname">{{ category.name|capfirst }}</div>
+<div class="catdesc">{{ category.description }}</div>
+<div id="clear"></div>
+
+<table id="product_list">
+{% for product in products %}
+<tr id="prodrow{{product.pk}}" 
+    class="{% cycle 'prodrow_odd' 'prodrow_even' %}">
+        <td style="text-align: center;">
+		<img src="{% if product.image %}{{product.image}}{% else %}blank.png{% endif %}"/>
+	</td>
+        <td>
+		<a href="/product/{{ product.pk }}">{{ product.name|capfirst }}</a>
+	</td>
+        <td> {{ product.description }} </td>
+        <td> {{ product.stock }} in stock</td>
+        <td> {{ product.price }} kr</td>
+        <td style="text-align: right;">
+		<button class="buyproduct" id="{{product.pk}}">Buy
+		</button>
+	</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+\end{lstlisting}
+\lstset{language=Python}
+This template extends \emph{base.html} so all the information surrounding
+this content is already taken care of. \emph{base.html} defines a number of
+``blocks'' where page-specific content can go. One of the blocks is
+``js\_docready'' which is located in the javascript-part of \emph{base.html}.
+The other block used in this template is the ``main''-block which is where, 
+in \emph{base.html}, the main content area is defined.
+
+The context provided to the template by the view-function can be used by the
+template tags. For instance \emph{ \{\{ category.name|capfirst \}\} } will
+get the attribute \emph{name} from the \emph{category}-object in the context
+and then call the method \emph{capfirst}\footnote{This method makes the
+first letter in a string a capital letter} with this information as the
+argument. The output in the template will be the result of 
+\emph{capfirst(category.name)}.
+
+Similarly the template language supports loops and control sequences, as seen
+in \emph{ \{\% for X in Y \%\} }, \emph{ \{\% endfor \%\} } and
+\emph{ \{\% if condition \%\} }, \emph{ \{\% else \%\} }, \emph{ \{\% endif \%\} }, 
 
 \subsection{Content management system}
 The basic point of a CMS is to separate the administration of the website and
@@ -372,18 +458,18 @@ a large site, especially the details of editing html and styling the content.
 
 \section{Establish a relational database for e-commerce}
 \subsection{Schema}
-Since I have created the models in the last handin 
-(sections \ref{sec:djangomodels} and \ref{sec:sqlmodels})
-I will now create an ER-diagram based on those specifications.
 
 My schema consists of these entities:
 \begin{itemize}
-\setlength\itemsep{-5pt}
+\setlength\itemsep{-7pt}
 \item Customer
 \item Category
 \item Asset
 \item Basket
-\item Order
+\item BasketItem
+\item Grade
+\item GradeHistory
+\item Comment
 \end{itemize}
 There is one additional entity which has a relationship to my model but isn't
 defined by me. This is the \emph{User} entity that belongs to Django that I
@@ -391,23 +477,17 @@ extend using the Customer entity.
 
 The relationships between these entities are as follows:
 \begin{itemize}
-\setlength\itemsep{-5pt}
+\setlength\itemsep{-7pt}
 \item \emph{Customer} extends \emph{User}
 \item \emph{Asset} belongs to a \emph{Category}
-\item \emph{Basket} contains \emph{Asset}s
+\item \emph{BasketItem} belongs to a \emph{Basket}
+\item \emph{BasketItem} contains an \emph{Asset}
 \item \emph{Basket} belongs to a \emph{Customer}
-\item \emph{Order} contains \emph{Asset}s
-\item \emph{Order} belongs to a \emph{Customer}
+\item \emph{Grade} belongs to an \emph{Asset}
+\item \emph{GradeHistory} belongs to a \emph{Customer}
+\item \emph{Comment} belongs to a \emph{Customer}
+\item \emph{Comment} belongs to an \emph{Asset}
 \end{itemize}
-\emph{Order} and \emph{Basket} have the same relationships. This is because
-an order is essentially a saved \emph{Basket}. The schema could be simplified
-by removing \emph{Order} altogether and adding an attribute to \emph{Basket}
-which indicates whether the contents of the basket has been ordered or not.
-I have chosen not to do this for now, because \emph{Order} also contains
-information about when the order was placed/filled, and it seems a waste to
-add these three fields (is\_order, date\_placed, date\_filled) to every
-\emph{Basket} row. This might change in the future.
-
 
 \subsubsection{Entity-Relationship Diagram}
 The entity-relationship diagram created from this information and with the
@@ -424,7 +504,7 @@ The meaning of the different symbols is explained in this figure:
 \begin{tikzpicture}[node distance=0.5cm, every edge/.style={link}]
 % Legend
 \node[entity] (leg_ent) [scale=0.65] {Entity};
-\node[relationship] (leg_rel) [scale=0.65, right=of leg_ent] {Relationship};
+\node[relationship] (leg_rel) [scale=0.65, right=of leg_ent] {\footnotesize{Relationship}};
 \node[attribute] (leg_att) [scale=0.65, right=0.5cm of leg_rel] {Attribute};
 %\node[draw,dashed,fit=(leg_ent) (leg_rel) (leg_att)] (leg_box) {};
 \end{tikzpicture}
@@ -441,21 +521,36 @@ The meaning of the different symbols is explained in this figure:
                                   draw=green!50!black!100, drop shadow]
 \begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
 \node[entity] (cust) {Customer};
-\node[relationship] (custusr) [above=of cust] {\,\,\,Extends\,\,\,\,} edge (cust);
+\node[relationship] (custusr) [above=of cust] {\footnotesize{\,\,\,Extends\,\,\,\,}} edge (cust);
 \node[entity] (user) [bottom color=black!20, draw=black!40!black!60, dotted] [above=of custusr] {User} edge (custusr);
 
 \node[entity] (asset) [right=5 cm of cust] {Asset};
-\node[relationship] (asscat) [above=of asset] {Belongs to} edge (asset);
+\node[relationship] (asscat) [above=of asset] {\footnotesize{Belongs to}} edge (asset);
 \node[entity] (category) [above=of asscat] {Category} edge (asscat);
 
-\node[relationship] (ordcus) [below left=1.5 cm and 1 cm of cust] {Belongs to} edge (cust);
-\node[relationship] (ordass) [below left=1cm and 0.2cm of asset] {\,\,\,Contains\,\,\,} edge (asset);
+\node[relationship] (bascus) [below right=1cm and 0.2cm of cust] {\small{Belongs to}} edge (cust);
+\node[relationship] (basass) [below right=1.5cm and 1cm of asset] {\footnotesize{\,\,\,Contains\,\,\,}} edge (asset);
 
-\node[relationship] (bascus) [below right=1cm and 0.2cm of cust] {Belongs to} edge (cust);
-\node[relationship] (basass) [below right=1.5cm and 1cm of asset] {\,\,\,Contains\,\,\,} edge (asset);
+\node[entity] (basket) [below left=5cm and 3cm of basass] {Basket} edge (bascus);
+\node[entity] (basketitem) [below left=0cm and 1.5cm of basass] {BasketItem}
+edge (basass);
 
-\node[entity] (order) [below right=2cm and 3cm of ordcus] {Order} edge (ordcus) edge (ordass);
-\node[entity] (basket) [below left=2cm and 3cm of basass] {Basket} edge (bascus) edge (basass);
+\node[relationship] (basitbas) [below right=1cm and 0.5cm of basketitem] {\small{Belongs to}}
+edge (basketitem) edge (basket);
+
+\node[entity] (gradehistory) [below left=5cm and -0.5cm of cust] {GradeHistory};
+\node[entity] (grade) [above left=1.5cm and 1cm of asset] {Grade};
+
+\node[relationship] (gradeass) [below right=1cm and -2cm of grade] {\small{Belongs to}}
+edge (grade) edge (asset);
+\node[relationship] (gradecust) [below left=of cust] {\footnotesize{Belongs to}}
+edge(cust) edge(gradehistory);
+
+\node[entity] (comment)  [below right=0cm and 1cm of gradehistory] {Comment};
+\node[relationship] (custcomment) [below left=0.1cm and 1cm of bascus] {\footnotesize{Belongs to}} 
+edge (cust) edge (comment);
+\node[relationship] (asscomment) [above right=3cm and 1cm of comment] {\footnotesize{Belongs to}}
+edge (comment) edge (asset);
 
 % Customer attributes
 \node[attribute] (address) [above left=1.25cm and 0.5cm of cust] {Address} edge (cust);
@@ -466,9 +561,25 @@ The meaning of the different symbols is explained in this figure:
 \node[attribute] (desc) [above right=0.25cm and 1.5cm of asset] {Description} edge (asset);
 \node[attribute] (stock) [above right=-1cm and 1.5cm of asset] {Stock} edge (asset);
 
-% Order attributes
-\node[attribute] (dateordered) [below left=0.5cm and 1.5cm of order] {Order placed} edge (order);
-\node[attribute] (datefilled) [below left=1.25cm and -2cm of order] {Order filled} edge (order);
+% Basket attributes
+\node[attribute] (active) [below right=0.5cm and -1cm of basket] {Active baset} edge (basket);
+\node[attribute] (dateordered) [below right=-0.5cm and 1cm of basket] {Order placed} edge (basket);
+\node[attribute] (datefilled) [below right=-1.5cm and 1.5cm of basket] {Order filled} edge (basket);
+
+% BasketItem attributes
+\node[attribute] (count) [below left=0.5cm and -1cm of basketitem] {Count}
+edge (basketitem);
+
+% Grade attributes
+\node[attribute] (gradecount) [above left=0.5cm and -1cm of grade] {Count} edge (grade);
+\node[attribute] (gradesum) [above left=1.5cm and -2.5cm of grade] {Sum} edge (grade);
+
+% GradeHistory attributes
+\node[attribute] (ghhistory) [below left=1cm and -2cm of gradehistory] {history} edge (gradehistory);
+
+% Comment attributes
+\node[attribute] (timestamp) [below left=0.5cm and -1cm of comment] {timestamp} edge (comment);
+\node[attribute] (ccomment) [below right=1.5cm and -1cm of comment] {comment} edge (comment);
 
 % Category attributes
 \node[attribute] (cname) [above left=1cm and 0cm of category] {Name} edge (category);
@@ -478,12 +589,9 @@ The meaning of the different symbols is explained in this figure:
 \label{fig:erdiag}
 \end{figure}
 
-
 \subsection{Use cases}
 I have tried to think of a few different use cases that might be typical for the
-people interacting with the webshop. I'm not entirely sure that I structured
-the use-cases correctly, or if the use-case diagram (figure \ref{fig:usecase}) is
-correctly designed.
+people interacting with the webshop.
 
 \subsubsection{Browse category}
 
@@ -700,23 +808,321 @@ for n, d, c, s in products:
 This creates a number of categories and then a number of assets which
 belong to the different categories.
 
-\subsection{Goals for the upcoming sprint}
-In the upcoming sprint I plan to:
-\begin{itemize}
-\setlength\itemsep{-5pt}
-\item Extend the test-data to include customers, orders and shopping-baskets
-\item Add more functionality to the website (i.e clicking ``buy'' on a product adds it to the shopping basket)
-\item The product listings also needs to look better, and support images too. 
-Whether the images should be stored as files or as an additional field in the
-database is not yet decided.
-\end{itemize}
-
 \subsection{Tools and references}
 The diagrams were created using the \LaTeX-package
 ``Ti\emph{k}Z'', which I've used before and is great in many ways for diagram
-drawing and data plotting. The Ti\emph{k}Z-manual can be found here:
-\url{http://www.texample.net/media/pgf/builds/pgfmanualCVS2012-11-04.pdf}
-and there are plenty of different Ti\emph{k}Z-examples on this page:
-\url{http://www.texample.net/tikz/examples/} (including an ER-diagram example).
+drawing and data plotting. The Ti\emph{k}Z-manual\footnote{\url{http://www.texample.net/media/pgf/builds/pgfmanualCVS2012-11-04.pdf}} 
+contains in depth detail and there are plenty of different 
+Ti\emph{k}Z-examples on the \TeX ample.net-page\footnote{
+\url{http://www.texample.net/tikz/examples/}} (including an ER-diagram example).
+
+\section{Shopping basket}
+The way I have chosen to do the shopping basket is to have a basket that is
+bound to the user and saved in the database so that it persists between
+sessions.
+This means that a user can log on, browse for a while, add some products to
+the basket and then log out. The next time that user logs on the basket will
+still be there.
+
+When a user buys a product there are two steps involved. The first step is
+placing the product in the basket and the second step is placing the actual
+order. Since products are limited by the number stored in the warehouse,
+it is important to choose whether to reserve the product when it is added
+to the basket, or to check if there are sufficient numbers of the product in 
+stock at the time of placing the order.
+
+Since the basket is stored between sessions in this case, it was an easy choice.
+Updating stock on the product when placing it in the basket could mean
+reserving it indefinitely, which is not good at all.
+The right thing to do in this case is to hold off on that check until the order
+is placed. This could mean that the user can't order the items because they
+are out of stock, but this is a natural scenario and easily remedied by going
+back to the basket and updating the amount.
+
+\subsection{Implementation}
+The basket is implemented by adding two new tables in the database.
+Firstly there is the \textsc{Basket} table, which is defined through this model:
+\begin{lstlisting}
+class Basket(models.Model):
+	"""
+	Shopping basket, 
+	Belongs to a customer, contains a flag for whether it is an 
+	active basket or an order, and timestamps.
+	"""
+	customer = models.ForeignKey(Customer)
+	# Active = current basket, inactive = order
+	active = models.BooleanField(default=True) 
+
+	# These two fields are only interesting when the basket 
+	# becomes an order:
+
+	# Date the order was placed
+	date_placed = models.DateTimeField(null=True, blank=True) 
+
+	# Date the order was filled 
+	date_filled = models.DateTimeField(null=True, blank=True) 
+\end{lstlisting}
+The basket has two functions. If the attribute $active$ is \emph{True} then 
+the basketis the current shopping basket. 
+If no current shopping basket exists then one will be created automatically
+when the user performs any action on the webpage that requires a shopping basket.
+
+If $active$ is \emph{False}, then the basket is an order. When the user selects 
+``place order'' and the order has been validated the flag is switched from
+\emph{True} to \emph{False} and $date\_placed$ is set to the current date and time.
+
+When a warehouse worker needs to see which orders need attention, a query 
+on \textsc{Basket}s for rows where $date\_filled$ is not set will give a list
+of orders that are waiting for shipping. After the products have been packed
+and shipped the warehouse worker updates the field and sets it to the current
+date and time.
+
+The second new model is \textsc{BasketItem}. 
+\begin{lstlisting}
+class BasketItem(models.Model):    
+	"""    Maps assets to the basket
+	"""
+	basket = models.ForeignKey(Basket)
+	asset = models.ForeignKey(Asset)
+	count = models.IntegerField(default=0)
+(self.asset)
+\end{lstlisting}
+This table is basically a mapping between \textsc{Basket} and \textsc{Asset}.
+When a user adds an asset to the shopping basket, we first query the database
+for a \textsc{BasketItem}-entry with the users current \textsc{Basket} and the 
+current \textsc{Asset}. If such an entry exists then the $count$-field is
+incremented by one and the entry saved back to the database.
+It no such entry exists a new \textsc{BasketItem} is created with $count$
+initialized to 0.
+
+
+\section{Grading}
+
+There are a few different ways to implement rating of products. I will examine
+three methods and their merits/weaknesses.
+\subsection{One row per grade}
+The first method is to create a table with three columns (\emph{id} implied): 
+\begin{description}
+\setlength\itemsep{-7pt}
+\item[asset] Foreign key into the \textsc{Asset} table
+\item[customer] Foreign key into the \textsc{Customer} table
+\item[grade] The rating itself (a number between 1 and 5)
+\end{description}
+Every time a grade is added a new row is appended to this table.
+
+Calculating the grade of a product consists of fetching all the rows where 
+$asset = productID$, adding together all the $grade$s and dividing by the
+$count$ of the rows.
+
+The advantage of this system is that every review is traceable, you always
+know what rating a customer gave to a specific product. It is easy to prevent
+a user from rating a product more than once and the user could even have the
+ability to change the grade.
+
+The disadvantage is that if there are $n$ customers and $m$ products, and all
+customers grade every product there will be $n*m$ rows in this table.
+Furthermore, every time a product-page is fetched and the review is calculated
+we would have to fetch up to $n$ rows from the table to calculate the grade.
+
+\subsection{Low impact implementation}
+The second way is to simply keep a table with these attributes:
+\begin{description}
+\setlength\itemsep{-7pt}
+\item[asset] Foreign key into the \textsc{Asset} table
+\item[count] The number of votes
+\item[sum] Total sum of all ratings
+\end{description}
+Every time a product is rated the row with the correct $asset$ will have its
+$count$-field incremented by $1$ and the grade will be added to the $sum$. 
+
+Calculating the grade consists of fetching the one row from the database
+with the correct $asset$ and then evaluating $\frac{sum}{count}$.
+
+This has the advantage of being fast and easy to implement. Fast because every
+time a rating needs to be fetched only one row needs to be retrieved and only
+one calculation performed.
+The disadvantage is that a customer can keep rating the same product over and
+over again and thus skewing the total grade of the product.
+
+\subsection{The compromise}
+The third option is a compromise between the two previous methods.
+In the same way as the ``low impact method'' a grade-table is kept that
+consists of $asset$, $count$ and $sum$.
+
+However, to prevent users rating the same product over and over there is a
+second table, \textsc{GradeHistory}, that has two fields.
+\begin{description}
+% TODO: table, \caption{ \textsc{Grade}-able in the final method}
+\setlength\itemsep{-7pt}
+\item[customer] Foreign key into the \textsc{Customer} table
+\item[history] A comma-separated list of productID's that the user has rated
+\end{description}
+When a customer tries to rate a product, that customers' 
+\textsc{GradeHistory}-row is fetched and a check is done to see if productID is
+in the history-list. If it is, the rating is rejected. If it is not, the grade is
+accepted and the productID is added to the history.
+
+The same problem exists here, what if all $n$ customers rate all $m$ products?
+Then the history field would become very big. It will still only be one row that
+we need to fetch to perform the check.
+Limiting the size of the history-field is easy, one can simple settle with keeping
+a history of the last k grades, and if adding the grade to history causes it to be
+of length k+1 then \emph{pop()}-ing the fist grade will keep it in check. 
+
+This way a user can still vote more times for the same product, but
+only after having first voted for $k$ number of other products not in the
+ $history$-list. 
+
+In reality, since $history$ is a list of productID's, and is stored as a 
+\emph{varchar} in the database, setting $k$ can't be done exactly.
+For instance, if productID is only a single digit (``$1,2,3,4$'') then storing 
+$4$ values would take $4\cdot 2 - 1$ characters. But what if there are
+thousands of products, with productID's such as $9387$. Then we can store
+fewer values in the $history$-list.
+
+I have chosen to live with this ``soft'' limit and set the maximum length of
+the history to something relatively big, $1000$ characters in this case.
+
+Fetching a grade consists of getting the  one correct row from the 
+\textsc{Grade}-table and evaluating $\frac{sum}{count}$, one read and one
+calculation.
+Adding a grade fetches the row from \textsc{Grade} but also fetches the \textsc{GradeHistory}-row and checks if the user has already
+voted for this product.
+
+With this method the database won't grow out of control with a large number 
+of users and products but there are still some limitations on what the users 
+can do.
+
+\subsubsection{The implementation}
+The two models that have been added are \textsc{Grading} and 
+\textsc{GradeHistory}. These look like this:
+\begin{lstlisting}
+class Grade(models.Model):
+    """
+    Product ratings
+    """ 
+    asset = models.ForeignKey(Asset)
+    count = models.IntegerField(default=0)  # Total number of grades
+    sum = models.IntegerField(default=0)    # Total sum of all grades
+\end{lstlisting}
+\begin{lstlisting}
+class GradeHistory(models.Model):
+    """
+    A customers rating-history
+    """ 
+    customer = models.ForeignKey(Customer)
+    history = models.CharField(max_length=1000, default="")
+\end{lstlisting}
+
+When a product page is loaded, the related \textsc{Grade}-row is queried.
+If no rating has been given to the product yet a message about that will be
+shown. If there are ratings, the average is calculated and a tuple consisting of
+$(average rating, number of votes)$ is passed on to the template and shown.
+
+When a user gives a rating to a product (by selecting a number between 1 and 5
+in a dropdown box on the product page and then clicking the Rate-button) 
+an ajax call is done. The method invoked this way will first get the users
+\textsc{GradeHistory} row, or create it if it doesn't exist yet.
+If the current productID is found in the $history$-attribute of the
+\textsc{GradeHistory}-entry then the user is not allowed to rate the product,
+and an error message will be shown. If the $history$-attribute does not contain
+the product then the products \textsc{Grade}-row is loaded (or created if 
+it doesn't exist) and the $count$ and $sum$ fields are updated.
+
+\section{Comments}
+Comments are implemented using a single level of commenting, at this time
+there is no support for leaving a reply to a comment and having it show up
+as a related comment (see section~\ref{sec:related_comments} for the 
+reason why).
+
+\subsection{Implementation}
+The following model has been added:
+\begin{lstlisting}
+class Comment(models.Model):
+    """ 
+    Comment on a product
+    """
+    asset = models.ForeignKey(Asset)
+    customer = models.ForeignKey(Customer)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    comment = models.CharField(max_length=500)
+\end{lstlisting}
+Since there can be many comments on a product and we want to keep the time
+from when the page is requested until it is loaded in the clients browser as
+short as possible the comment-section of the product page is fetched by an
+ajax call. This means that the product-page will load and then the comments
+are loaded and placed in the comment-area.
+
+When a comment is added an javascript function takes the content of the
+comment-box and uses ajax to call a function that validates the comment.
+If something is wrong with the comment, an error message is shown.
+If everything was okay with the comment, it is added to the database and the
+comment-section is reloaded using ajax.
+
+\subsection{Related comments}
+\label{sec:related_comments}
+I started implementing related comments. 
+The way I did this is by adding a field to the \textsc{Comment}-model called
+$related\_to$. This field was a foreign key pointing back into \textsc{Comment}.
+If a comment is a reply to another comment then this field would be set to the
+$id$ of that comment and if the comment was a new comment and not related
+to other comments any way then the field would not be set.
+
+Building the tree of comments consisted of getting all the comments for the
+current asset and then recursively building the comment-structure, like this
+algorithm:
+\begin{lstlisting}
+
+all_comments = Comment.objects.filter(asset__pk = productID)
+
+base_comments = all_comments.filter(related_to = None)
+
+# Iterate over all base (level 0) comments
+for base_comment in base_comments:
+	# Fetch the comments that are directly children to this
+    	children = build_children_tree(all_comments, base_comment)
+    	comment_list.append( (base_comment, children) )
+
+def build_children_tree(all_comments, base_comment):
+	"""
+	Recursively build the comment tree
+	"""
+	# Remove the current comment from the list 
+	# to speed up things a bit later:
+	all_comments.remove(base_comment) 
+
+	list = []
+	children = all_comments.filter(response_to = base_comment)
+	if len(children) == 0:
+		return None
+	for child in children:
+		grandchildren = build_children_tree(all_comments, child)
+		list.append (child, grandchildren)
+	return list
+\end{lstlisting}
+The comment structure is a list of tuples: $(comment, [children])$ or 
+$(comment, None)$ if the comment has no children.
+Replacing the comment-objects with example comments it would look 
+something like this:
+\begin{verbatim}
+[
+  ("Denna produkt är bra", None),
+  ("Denna produkt är dålig", [ 
+      ("Varför det?", [
+          ("Därför att jag säger så", None)
+          ]) 
+  ]),
+  ("Det här är en orelaterad kommentar", None)
+]
+\end{verbatim}
+
+At this point I realized that Django-templates do not support recursion, 
+so rendering of comments would have to be done by generating the 
+HTML-code inline. Ofcourse you could still utilize the template-engine and
+render each level of recursion separately with a call to $render()$, but I decided
+to focus on other things instead for the time being. I might come back to this.
+
+
+
 
 \end{document}
