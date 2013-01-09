@@ -244,7 +244,7 @@ body {
 #comment {
 	margin-left: -14px;
 	display: inline-block;
-	padding-left: 15px;
+	/* padding-left: 15px; */
 }
 
 #comment > #comment_user {
@@ -264,6 +264,21 @@ body {
 	margin-left: 10px;
 }
 
+#comment > .commentreply {
+	float: right;
+	margin-right: 20px;
+	font-size: 8pt;
+	text-decoration: none;
+}
+
+#comment > .commentreply a {
+	color: #111111;
+	text-decoration: none;
+}
+
+#comment > .commentreply a:hover {
+	text-decoration: underline;
+}
 .comment_odd {
 	background-color: #e4eae4;
 }

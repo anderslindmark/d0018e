@@ -1,5 +1,6 @@
 from shopping.models import Category, Asset, Customer, Basket, BasketItem, Grade, GradeHistory, Comment
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 
 def get_categories(request, current=None):
 	"""
@@ -127,3 +128,28 @@ def fetch_comments(productID):
 		return False
 	return comments
 
+def comments_build_children_tree(all_comments, base_comment):
+	child_list = []
+	children = all_comments.filter(parent = base_comment)
+	if len(children) == 0:
+		return None
+
+	for child in children:
+		child_children = comments_build_children_tree(all_comments, child)
+		child_list.append( (child, child_children) )
+	
+	return child_list
+
+def comments_render(indent_level, commentlist):
+	html = ""
+	i = 0
+	for comment, children in commentlist:
+		# Render base comment
+		oddeven = 'comment_even' if i%2 == 0 else 'comment_odd'
+		padding = 15 + indent_level * 15
+		html += render_to_string('single_comment.html', {'comment': comment, 'padding': padding, 'oddeven': oddeven})
+		if children is not None:
+			# Render child-comments if they exist
+			html += comments_render(indent_level+1, children)
+		i += 1
+	return html

@@ -103,6 +103,7 @@ class Comment(models.Model):
 	customer = models.ForeignKey(Customer)
 	timestamp = models.DateTimeField(auto_now_add=True)
 	comment = models.CharField(max_length=500)
+	parent = models.ForeignKey('self', blank=True, null=True, related_name="child_of")
 
 	def __unicode__(self):
 		return str(self.customer.user.username) + " -> " + str(self.asset) + " @ " + str(self.timestamp) + ": \"" + unicode(self.comment) + "\""

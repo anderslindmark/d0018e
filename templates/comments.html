@@ -1,19 +1,24 @@
 {% if comments %}
-	{% for comment in comments %}
-	<div id="comment" class="{% cycle 'comment_odd' 'comment_even' %}">
-		<div class="comment_header" id="comment_timestamp">
-			{{ comment.timestamp|date:"Y-m-d H:i:s" }}
-		</div>
-		<div class="comment_header" id="comment_user">
-			{{ comment.customer }}
-		</div>
-		<div id="clear"></div>
-		<div id="comment_content">
-			<pre>{{ comment.comment }}</pre>
-		</div>
-	</div>
+	<script>
+	// Handle clicking reply
+	$(".commentreply").click( function(event) {
+		event.preventDefault();
+		alert("You want to reply to comment #" + this.id);
+	});
 
-	{% endfor %}
+	// Color each comment a differently from its neigbours
+	$("[id=comment]").each( function(index, element) {
+		if (index%2 == 0) {
+			$(this).attr("class", "comment_odd");
+		} else {
+			$(this).attr("class", "comment_even");
+		}
+	});
+	</script>
+	{{ comments|safe }}
 {% else %}
+<div id="clear"></div>
+<div style="padding-left: 5px;">
 	No comments yet
+</div>
 {% endif %}

@@ -56,6 +56,7 @@ $(".submitcomment").click( function() {
 	});
 });
 
+
 id = $(".commentsection").attr("id");
 $(".commentsection").load("/ajax/comments/" + id);
 {% endblock %}
@@ -98,7 +99,7 @@ This product has no rating yet
 <hr/>
 <div class="commenttitle">Comments</div>
 <div class="addcomment" id="{{ asset.pk }}">
-	<a href="javscript:void();">Add comment</a>
+	<a href="javascript:void();">Add comment</a>
 </div>
 <div class="newcomment">
 	<textarea id="newcomment_content" rows="7" cols="71"></textarea>

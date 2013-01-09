@@ -6,6 +6,7 @@ from shopping.models import Category, Asset, Customer, Basket, BasketItem, Grade
 from shopping.local_forms import CreateUser, CreateCustomer, PlaceOrder
 from shopping.views_helpers import get_categories, get_or_create_basket, get_basket_total, add_rating, get_rating, fetch_comments
 from shopping.views_helpers import customer_required
+from shopping.views_helpers import comments_build_children_tree, comments_render
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
@@ -112,19 +113,38 @@ def asset_getgrade(request, productID):
 	else:
 		return HttpResponse("No ratings")
 
+
 def get_comments(request, productID):
 	"""
 	Retrieve a list of comments for a specific product
 	"""
-	comments = fetch_comments(productID)
-	request_context = RequestContext(request, {
-				'comments': comments,
-		})
+	all_comments = fetch_comments(productID)
+	if not all_comments:
+		# No comments
+		request_context = RequestContext(request, {
+					'comments': None,
+			})
+	else:
+		# There are comments
+		base_comments = all_comments.filter(parent = None) # These are the base-comments (not a child to other comments)
+		comment_list = []
+		# Build the comment-tree
+		for base_comment in base_comments:
+			children = comments_build_children_tree(all_comments, base_comment)
+			comment_list.append((base_comment, children))
+
+		# Render the comment tree into html
+		html = comments_render(0, comment_list)
+
+		request_context = RequestContext(request, {
+					'comments': html,
+			})
+
 	return render(request, "comments.html", request_context)
 
 @login_required
 @csrf_exempt
-def add_comment(request, productID):
+def add_comment(request, productID, replyTo=None):
 	"""
 	Add a comment to a product. Comment content is expected to be in POST data
 	"""
