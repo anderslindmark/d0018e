@@ -6,7 +6,7 @@ $(".buyproduct").click( function() {
 	{
 		if (data == "OK")
 		{
-			$(".buyproduct").effect("transfer", {to: $(".arrowicon")}, 750);
+			$(".productpurchase").effect("transfer", {to: $(".arrowicon")}, 750);
 		}
 		else
 		{
@@ -62,22 +62,21 @@ $(".commentsection").load("/ajax/comments/" + id);
 {% endblock %}
 
 {% block main %}
-<h1>{{ asset.name|capfirst }}</h1>
-<h2>{{ asset.description }}</h2>
+<div class="catname">{{ asset.name|capfirst }}</div>
+<div class="catdesc">{{ asset.tagline }}</div>
 
 {% if asset.image %}
 {% load static %}
-<img src="{% get_media_prefix %}/{{ asset.image }}" />
+<div id="clear"></div>
+<img class="productimg" src="{% get_media_prefix %}/{{ asset.image }}" />
 {% endif %}
 
-<p> This is where the detailed description will go once it is enabled</p>
-<p>(and an image should go somewhere too)</p>
+<div class="productdescription">
+	{{ asset.description }}
+</div>
+<div id="clear"></div>
 
-<p>{{ asset.price }} kr</p>
-<button class="buyproduct" id="{{ asset.pk }}">Buy</button>
-
-
-<div id="rating">
+<div class="productrating">
 	<h3>Rating</h3>
 {% if rating %}
 Grade: {{ rating.0|floatformat }} ({{rating.1}} votes)
@@ -85,7 +84,14 @@ Grade: {{ rating.0|floatformat }} ({{rating.1}} votes)
 This product has no rating yet
 {% endif %}
 </div>
-<!-- TODO: Only show this for logged in users -->
+
+<div class="productpurchase">
+	<strong>{{ asset.price }} kr</strong>
+	<button class="buyproduct" id="{{ asset.pk }}">Buy</button>
+</div>
+
+
+
 {% if user.is_authenticated %}
 <p>Rate this product:<select id="grade">
 		<option value="1">1</option>

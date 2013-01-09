@@ -21,7 +21,7 @@ $.get("/ajax/addproduct/" + this.id, function(data) {
 <tr id="prodrow{{product.pk}}" class="{% cycle 'prodrow_odd' 'prodrow_even' %}">
 		<td style="text-align: center;"> <img src="{% get_media_prefix %}{% if product.image %}{{product.image}}{% else %}blank.png{% endif %}"/></td>
 		<td> <a href="/product/{{ product.pk }}">{{ product.name|capfirst }}</a> </td>
-		<td> {{ product.description }} </td>
+		<td> {{ product.tagline }} </td>
 		<td> {{ product.stock }} in stock</td>
 		<td> {{ product.price }} kr</td>
 		<td style="text-align: right;"> <button class="buyproduct" id="{{product.pk}}">Buy</button> </td>

@@ -37,7 +37,9 @@ class Asset(models.Model):
 	Represents a product.
 	"""
 	name = models.CharField(max_length=50)
-	description = models.CharField(max_length=150)
+	# description = models.CharField(max_length=150) # Old
+	tagline = models.CharField(max_length=55)
+	description = models.TextField()
 	category = models.ForeignKey(Category) # Which category does this asset belong to
 	price = models.IntegerField()
 	stock = models.IntegerField() # How many of this asset are in stock

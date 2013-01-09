@@ -100,19 +100,6 @@ def asset_addgrade(request, productID, grade):
 		# Rating was denied, user has rated the product before
 		return HttpResponse("Denied")
 	
-def asset_getgrade(request, productID):
-	"""
-	Retrieve the rating for a product. Returns "No ratings" if no ratings are available
-	"""
-	# TODO: will this view be used?
-
-	rating = get_rating(productID)
-	if rating:
-		grade, count = rating
-		return HttpResponse(str(grade))
-	else:
-		return HttpResponse("No ratings")
-
 
 def get_comments(request, productID):
 	"""

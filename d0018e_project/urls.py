@@ -40,6 +40,7 @@ urlpatterns = patterns('',
 	url(r'^ajax/addrating/(?P<productID>\d+)/(?P<grade>\d+)$', 'shopping.views.asset_addgrade'),
 	#url(r'^ajax/getgrade/(?P<productID>\d+)$', 'shopping.views.asset_getgrade'),
 	url(r'^ajax/comments/add/(?P<productID>\d+)$', 'shopping.views.add_comment'),
+	url(r'^ajax/comments/add/(?P<productID>\d+)/(?P<replyTo>\d+)$', 'shopping.views.add_comment'),
 	url(r'^ajax/comments/(?P<productID>\d+)$', 'shopping.views.get_comments'),
 
     # Uncomment the admin/doc line below to enable admin documentation:

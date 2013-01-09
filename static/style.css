@@ -237,6 +237,29 @@ body {
 	background-color: #e7f1ec;
 }
 
+img.productimg {
+	margin-top: 25px;
+	margin-right: 25px;
+	max-height: 275px;
+	max-width: 275px;
+	float: right;
+}
+
+.productdescription {
+	margin-top: 35px;
+	/* TODO: Make me */
+}
+
+.productpurchase {
+	/* TODO: Make me */
+	margin-right: 50px;
+	float: right;
+}
+
+.productrating {
+	/* TODO: Make me */
+}
+
 .commentsection > #comment {
 	width: 100%;
 }
