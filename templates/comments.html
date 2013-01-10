@@ -3,7 +3,38 @@
 	// Handle clicking reply
 	$(".commentreply").click( function(event) {
 		event.preventDefault();
-		alert("You want to reply to comment #" + this.id);
+		$(".replytobox").show();
+		$(".replytobox").attr("id", this.id); // Set id of the comment box to the commentID that is replied to
+		// this.id = commentid
+		$(".replytobox").css( {
+			left: $(this).position().left - $(".replytobox").width()/2,
+			top: $(this).position().top + 20,
+		});
+	});
+
+	// Close reply-to box
+	$(".closereplyto").click( function(event) {
+		$(".replytobox").hide();
+		$("#replycomment_content").val("");
+	});
+
+	$(".submitreplycomment").click( function(event) {
+		var productID = $(".commentsection").attr("id");
+		var commentID = $(".replytobox").attr("id");
+		var url = "/ajax/comments/add/" + productID + "/" + commentID;
+		var comment = $("#replycomment_content").val();
+		$.post(url, {'comment': comment}, function(data) {
+			if (data == "OK")
+			{
+				$(".replybox").hide();
+				$("#replycomment_content").val("");
+				$(".commentsection").load("/ajax/comments/" + productID);
+			}
+			else
+			{
+				alert(data);
+			}
+		});
 	});
 
 	// Color each comment a differently from its neigbours
@@ -28,3 +59,12 @@
 	No comments yet
 </div>
 {% endif %}
+
+<div class="replytobox">
+	    <textarea id="replycomment_content" rows="5" cols="31"></textarea>
+		<div id="clear"></div>
+		<div style="float: right;">
+			<button class="closereplyto">Close</button>
+			<button class="submitreplycomment" id="{{ asset.pk }}">Reply</button>
+		</div>
+</div>

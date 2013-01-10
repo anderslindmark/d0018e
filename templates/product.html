@@ -78,32 +78,36 @@ $(".commentsection").load("/ajax/comments/" + id);
 
 <div class="productrating">
 	<h3>Rating</h3>
-{% if rating %}
-Grade: {{ rating.0|floatformat }} ({{rating.1}} votes)
-{% else %}
-This product has no rating yet
-{% endif %}
+	{% if rating %}
+	Grade: {{ rating.0|floatformat }} ({{rating.1}} votes)
+	{% else %}
+	This product has no rating yet
+	{% endif %}
+	{% if user.is_authenticated %}
+		<p>Rate this product:
+			<select id="grade">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+			</select>
+			<button class="do_grade" id="{{ asset.pk }}">Rate</button>
+		</p>
+	{% endif %}
 </div>
 
 <div class="productpurchase">
+	<h3>Buy this product</h3>
 	<strong>{{ asset.price }} kr</strong>
 	<button class="buyproduct" id="{{ asset.pk }}">Buy</button>
 </div>
+<div id="clear"></div>
 
 
-
-{% if user.is_authenticated %}
-<p>Rate this product:<select id="grade">
-		<option value="1">1</option>
-		<option value="2">2</option>
-		<option value="3">3</option>
-		<option value="4">4</option>
-		<option value="5">5</option>
-	</select>
-	<button class="do_grade" id="{{ asset.pk }}">Rate</button>
-</p>
 <hr/>
 <div class="commenttitle">Comments</div>
+{% if user.is_authenticated %}
 <div class="addcomment" id="{{ asset.pk }}">
 	<a href="javascript:void();">Add comment</a>
 </div>

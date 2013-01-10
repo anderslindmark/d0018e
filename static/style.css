@@ -247,16 +247,20 @@ img.productimg {
 
 .productdescription {
 	margin-top: 35px;
-	/* TODO: Make me */
+	margin-right: 325px;
 }
 
 .productpurchase {
-	/* TODO: Make me */
 	margin-right: 50px;
 	float: right;
+	display: inline-block;
 }
 
+.buyproduct {
+	float: right;
+}
 .productrating {
+	display: inline-block;
 	/* TODO: Make me */
 }
 
@@ -334,6 +338,13 @@ hr {
 	display: none;
 	margin-top: 50px;
 	width: 100%;
+}
+
+.replytobox {
+	display: none;
+	background: #d6e3dd;
+	position: absolute;
+	border: 1px solid black;
 }
 
 #comment_content pre {

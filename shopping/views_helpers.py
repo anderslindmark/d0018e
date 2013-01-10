@@ -142,14 +142,11 @@ def comments_build_children_tree(all_comments, base_comment):
 
 def comments_render(indent_level, commentlist):
 	html = ""
-	i = 0
 	for comment, children in commentlist:
 		# Render base comment
-		oddeven = 'comment_even' if i%2 == 0 else 'comment_odd'
 		padding = 15 + indent_level * 15
-		html += render_to_string('single_comment.html', {'comment': comment, 'padding': padding, 'oddeven': oddeven})
+		html += render_to_string('single_comment.html', {'comment': comment, 'padding': padding })
 		if children is not None:
 			# Render child-comments if they exist
 			html += comments_render(indent_level+1, children)
-		i += 1
 	return html

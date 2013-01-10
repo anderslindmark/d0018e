@@ -17,7 +17,7 @@ def show_account(request):
 	"""
 	cust = Customer.objects.get(user=request.user)
 
-	baskets = Basket.objects.filter(customer=cust).filter(active=False)
+	baskets = Basket.objects.filter(customer=cust).filter(active=False).order_by('-date_placed')
 	orders = []
 	for order in baskets:
 		items = BasketItem.objects.filter(basket=order)

@@ -121,10 +121,10 @@ def get_comments(request, productID):
 			comment_list.append((base_comment, children))
 
 		# Render the comment tree into html
-		html = comments_render(0, comment_list)
+		comments = comments_render(0, comment_list)
 
 		request_context = RequestContext(request, {
-					'comments': html,
+					'comments': comments,
 			})
 
 	return render(request, "comments.html", request_context)
@@ -144,11 +144,17 @@ def add_comment(request, productID, replyTo=None):
 		try:
 			asset = Asset.objects.get(pk = productID)
 			customer = Customer.objects.get(user=request.user)
+			if replyTo is not None:
+				parent = Comment.objects.get(pk=replyTo)
+			else:
+				parent = None
 		except Asset.DoesNotExist:
 			return HttpResponse("No such product")
 		except Customer.DoesNotExist:
 			return HttpResponse("Please fill in your account information")
-		comment = Comment(asset=asset, customer=customer, comment=comment)
+		except Comment.DoesNotExist:
+			return HttpResponse("The parent comment does not exist")
+		comment = Comment(asset=asset, customer=customer, comment=comment, parent=parent)
 		comment.save()
 		return HttpResponse("OK")
 		
