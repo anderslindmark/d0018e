@@ -2,6 +2,7 @@
 
 {% block js_docready %}
 $(".buyproduct").click( function() {
+	{% if user.is_authenticated %}
 	$.get("/ajax/addproduct/" + this.id, function(data) 
 	{
 		if (data == "OK")
@@ -13,6 +14,10 @@ $(".buyproduct").click( function() {
 			alert(data);
 		}
     });
+	{% else %}
+	var baseurl = String(window.location).replace(window.location.pathname, '');
+	window.location.replace(baseurl + '/account/login?next={{ request.path }}');
+	{% endif %}
 });
 
 $(".do_grade").click( function() {

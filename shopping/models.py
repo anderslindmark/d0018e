@@ -24,7 +24,6 @@ class Category(models.Model):
 	"""
 	name = models.CharField(max_length=50)
 	description = models.CharField(max_length=150)
-	#detailed_description = models.CharField(max_length=5000) # TODO: Add this
 
 	def __unicode__(self):
 		return self.name
@@ -37,7 +36,6 @@ class Asset(models.Model):
 	Represents a product.
 	"""
 	name = models.CharField(max_length=50)
-	# description = models.CharField(max_length=150) # Old
 	tagline = models.CharField(max_length=55)
 	description = models.TextField()
 	category = models.ForeignKey(Category) # Which category does this asset belong to
@@ -57,6 +55,7 @@ class Basket(models.Model):
 	"""
 	customer = models.ForeignKey(Customer)
 	active = models.BooleanField(default=True) # Active = current basket, inactive = order
+
 	# These two fields are only interesting when the basket becomes an order:
 	date_placed = models.DateTimeField(null=True, blank=True) # Date the order was placed
 	date_filled = models.DateTimeField(null=True, blank=True) # Date the order was filled 
@@ -71,7 +70,7 @@ class BasketItem(models.Model):
 	"""
 	basket = models.ForeignKey(Basket)
 	asset = models.ForeignKey(Asset)
-	count = models.IntegerField(default=0)
+	count = models.IntegerField(default=1)
 
 	def __unicode__(self):
 		return str(self.basket) + ": " + str(self.count) + " * " + str(self.asset)

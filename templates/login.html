@@ -14,6 +14,7 @@
 <h1>Account</h1>
 
 <p><strong>Please enter your login information</strong></p>
+<p><a href="/account/create">Click here</a> if you do not have an account</p>
 
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
@@ -32,7 +33,7 @@
 		</tr>
 	</table>
 
-	<input type="submit" value="login" />
+	<input type="submit" value="Login" />
 	<input type="hidden" name="next" value="{{ next }}" />
 </form>
 </div>

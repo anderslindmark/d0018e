@@ -60,6 +60,9 @@ def customer_required(func, redirect_url='/account/missing_info'):
 	return check
 
 def add_rating(customer, productID, rating):
+	"""
+	Add a rating to a product. Returns False if the rating was not allowed, True otherwise
+	"""
 	try:
 		gradehist = GradeHistory.objects.get(customer=customer)
 	except GradeHistory.DoesNotExist:
@@ -129,6 +132,23 @@ def fetch_comments(productID):
 	return comments
 
 def comments_build_children_tree(all_comments, base_comment):
+	"""
+	Build a comment tree for one comment (base_comment). 
+	Direct children will be all the comments in all_comment whose 'parent'-field points to base_comments, and so on.
+	Will return a list of tuples. A comment with no children will consist of the tuple (comment, None),
+	a comment with children will consist of the tuple (comment, [childlist]) where childlist is a list created recursively by this function.
+	Example:
+	[
+		(comment_1, None),
+		(comment_2, [
+						(comment_4, [
+										(comment_6, None)
+									]),
+						(comment_5, None)
+					]),
+		(comment_3, None)
+	]
+	"""
 	child_list = []
 	children = all_comments.filter(parent = base_comment)
 	if len(children) == 0:
@@ -141,6 +161,9 @@ def comments_build_children_tree(all_comments, base_comment):
 	return child_list
 
 def comments_render(indent_level, commentlist):
+	"""
+	Renders a comment-tree (as produced by comments_build_children_tree()) using a template and returns the raw html.
+	"""
 	html = ""
 	for comment, children in commentlist:
 		# Render base comment

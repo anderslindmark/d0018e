@@ -3,11 +3,15 @@
 
 {% block js_docready %}
 $(".buyproduct").click( function() {
-$.get("/ajax/addproduct/" + this.id, function(data) {
-		// TODO: Check for "OK"
-	});
-	$("#prodrow" + this.id).effect("transfer", {to: $(".arrowicon")}, 750);
-
+	{% if user.is_authenticated %}
+	$.get("/ajax/addproduct/" + this.id, function(data) {
+			// TODO: Check for "OK"
+		});
+		$("#prodrow" + this.id).effect("transfer", {to: $(".arrowicon")}, 750);
+	{% else %}
+	var baseurl = String(window.location).replace(window.location.pathname, '');
+	window.location.replace(baseurl + '/account/login?next={{ request.path }}');
+	{% endif %}
 });
 {% endblock %}
  

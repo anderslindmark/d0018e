@@ -76,6 +76,9 @@ def update_product_count(request, itemID, count):
 @login_required
 @customer_required
 def place_order(request):
+	"""
+	Places an order
+	"""
 	basket = get_or_create_basket(request)
 	items = BasketItem.objects.filter(basket=basket)
 	total = get_basket_total(items)
